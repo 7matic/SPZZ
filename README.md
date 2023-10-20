@@ -10,6 +10,7 @@
 - Amadej Miličev
 - Nejc Vene
 - Gašper Rifel
+- Sašo Primožič
 - Matic Zadobovšek
 
 ---
