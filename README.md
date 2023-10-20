@@ -6,7 +6,7 @@
 
 
 ## Collaborators:
-- Kristijan Petrič
+- Kris Petrič
 - Amadej Miličev
 - Nejc Vene
 - Gašper Rifel
