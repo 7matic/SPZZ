@@ -1,0 +1,11 @@
+version: '3'
+services:
+  cv-parser:
+    build: .
+    image: cv-parser-image
+    container_name: cv-parser-container
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    command: ["python", "cv-parser.py"]
