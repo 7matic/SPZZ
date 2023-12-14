@@ -17,3 +17,8 @@ To stop the application and remove the containers, networks, etc., run the follo
 ```bash
 docker compose down
 ```
+
+## Accessing the API
+
+Once the application is running, you can access the interactive API documentation by navigating to `http://localhost:5000/docs` in your web browser.
+The interactive documentation is powered by Swagger UI.
