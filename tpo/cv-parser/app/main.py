@@ -10,7 +10,7 @@ class Filename(BaseModel):
 
 app = FastAPI()
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("./model-best")
 
 # ---------------------------------
 # R O U T E S
@@ -21,14 +21,24 @@ async def read_cv_info(file: Filename):
     directory = "./pdfs"
     filepath = os.path.join(directory, file.filename) + ".pdf"
     
-    validate_file(filepath)
-    cv_text = extract_cv_text(filepath)
-    doc = nlp(cv_text) 
-    first_name, last_name = extract_names(doc)
-    email = extract_email(cv_text)
-    phone_number = extract_phone_number(cv_text)
+    cv_text = extract_text(filepath)
+    text = cv_text
+    
+    text = text.strip()
+    text = ' '.join(text.split())
+    
+    doc = nlp(text)
+    for ent in doc.ents:
+        print(ent.text, "       ->>>>>>>> ", ent.label_)
+    
+    #validate_file(filepath)
+    #cv_text = extract_cv_text(filepath)
+    #doc = nlp(cv_text) 
+    #first_name, last_name = extract_names(doc)
+    #email = extract_email(cv_text)
+    #phone_number = extract_phone_number(cv_text)
 
-    return {"first_name": first_name, "last_name": last_name, "email": email, "phone_number": phone_number}
+    #return {"first_name": first_name, "last_name": last_name, "email": email, "phone_number": phone_number}
 
 # ---------------------------------
 # H E L P E R   F U N C T I O N S
@@ -137,3 +147,24 @@ def extract_phone_number(cv_text: str):
     matches = re.findall(phone_regex, cv_text)
 
     return matches[0] if matches else None
+
+def extract_skills(cv_text: str, skills_list: list):
+    """
+    Extracts the skills from the given CV text.
+
+    Checks if any of the skills in the skills list are present in the CV text.
+
+    Args:
+        cv_text (str): The text of the CV.
+        skills_list (list): A list of known skills.
+
+    Returns:
+        list: The skills found in the CV.
+    """
+    
+    cv_skills = []
+    for skill in skills_list:
+        if skill.lower() in cv_text.lower():
+            cv_skills.append(skill)
+
+    return cv_skills
