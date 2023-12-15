@@ -22,3 +22,7 @@ docker compose down
 
 Once the application is running, you can access the interactive API documentation by navigating to `http://localhost:5000/docs` in your web browser.
 The interactive documentation is powered by Swagger UI.
+
+## Creating a custom NER model
+
+To create a custom Named Entity Recognition (NER) model for parsing CVs, there is a Jupyter notebook `NER_custom_model.ipynb` that guides you through the process.
