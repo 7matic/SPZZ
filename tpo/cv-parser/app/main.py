@@ -23,7 +23,14 @@ class CVResponse(BaseModel):
 
 app = FastAPI()
 
-nlp = spacy.load("./model-best")
+# nlp_old refers to an older model that is loaded from the path "./old_model" (uses train_data.json).
+# This model has been found to perform better on the specific task of parsing CVs in our application, 
+# so it is still being used despite the availability of a newer model.
+nlp_old = spacy.load("./old_model")
+# nlp_new refers to a newer model that is loaded from the path "./new_model" (uses train_data2.json).
+# This model has shown better results in tests, however, for the specific task of parsing CVs in our application,
+# it has been found to perform worse than the older model.
+nlp_new = spacy.load("./new_model")
 
 # ---------------------------------
 # ROUTES
@@ -128,17 +135,20 @@ async def read_cv_info(request: CVRequest):
     raw_text = extract_cv_text(filepath)
     processed_text = ' '.join(raw_text.strip().split())
 
-    doc = nlp(processed_text)
+    # The old model better with processed data
+    doc_old = nlp_old(processed_text)
+    # The new model works better with unprocessed data
+    doc_new = nlp_new(raw_text)
 
-    first_name, last_name = extract_names(doc)
+    first_name, last_name = extract_names(doc_old)
     email = extract_email(processed_text)
     phone_number = extract_phone_number(processed_text)
-    location = extract_location(doc)
-    designations = extract_designations(doc)
-    college = extract_college(doc)
-    degrees = extract_degrees(doc)
-    work_experience = extract_work_experience(doc)
-    skills = extract_skills(doc)
+    location = extract_location(doc_old)
+    designations = extract_designations(doc_old)
+    college = extract_college(doc_old)
+    degrees = extract_degrees(doc_old)
+    work_experience = extract_work_experience(doc_old)
+    skills = extract_skills(doc_old)
 
     return {
         "first_name": first_name,
@@ -355,7 +365,7 @@ def extract_work_experience(doc: str):
     Extracts the 'Companies worked at' entities from the given document.
 
     This function uses Named Entity Recognition (NER) to identify and extract the 'Companies worked at' entities from the document. 
-    The 'Companies worked at' entities are blocks of text in the document that have been labeled as 'Companies worked at' by the NER model.
+    The 'Companies worked at' entities are blocks of text in the document that have been labeled as 'Companies worked at' by the NER (2) model.
 
     Args:
         doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 

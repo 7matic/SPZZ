@@ -1,6 +1,13 @@
+## Building the Application
+Navigate to the directory containing the `docker-compose.yml` file. Before running the application, it's important to build the Docker images that the application will use. Run:
+
+```bash
+docker compose build
+```
+
 ## Running the Application
 
-To run the application, navigate to the directory containing the `docker-compose.yml` file and run the following command in your terminal:
+To run the application, run the following command in your terminal:
 
 ```bash
 docker compose up
