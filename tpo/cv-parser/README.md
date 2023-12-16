@@ -1,3 +1,15 @@
+## Important Notice
+
+This repository uses Git Large File Storage (LFS) to handle large files. To ensure that the repository works properly, you need to have Git LFS installed and set up on your machine.
+
+Follow these steps:
+
+1. Download and install Git LFS from the [official website](https://git-lfs.github.com/).
+2. Run `git lfs install` to set up Git LFS.
+3. Run `git lfs pull` to download the large files.
+
+If you don't follow these steps, some files in the repository will not work correctly.
+
 ## Building the Application
 Navigate to the directory containing the `docker-compose.yml` file. Before running the application, it's important to build the Docker images that the application will use. Run:
 
