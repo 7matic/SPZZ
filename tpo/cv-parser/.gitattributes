@@ -1,1 +1,2 @@
-model-best/** filter=lfs diff=lfs merge=lfs -text
+old_model/** filter=lfs diff=lfs merge=lfs -text
+new_model/** filter=lfs diff=lfs merge=lfs -text
