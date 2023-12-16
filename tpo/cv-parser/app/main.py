@@ -1,47 +1,160 @@
 from fastapi import FastAPI, HTTPException
 from pdfminer.high_level import extract_text
 from pydantic import BaseModel
+from typing import List, Optional
 import spacy
 import os
 import re
 
-class Filename(BaseModel):
+class CVRequest(BaseModel):
     filename: str
+   
+class CVResponse(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    email: Optional[str]
+    phone_number: Optional[str]
+    location: Optional[str]
+    designations: List[str] = []
+    college: List[str] = []
+    degrees: List[str] = []
+    work_experience: List[str] = []
+    skills: List[str] = []
 
 app = FastAPI()
 
 nlp = spacy.load("./model-best")
 
 # ---------------------------------
-# R O U T E S
+# ROUTES
 # ---------------------------------
 
-@app.post("/read_cv_info")
-async def read_cv_info(file: Filename):
+@app.post("/read_cv_info", response_model = CVResponse, responses = {
+    200: {"model": CVResponse, "description": "Successful Response"},
+    400: {"description": "Bad Request - Invalid Input"},
+    500: {"description": "Internal Server Error"}
+})
+async def read_cv_info(request: CVRequest):
+    """
+    Parses the specified CV PDF file and extracts key information.
+
+    This endpoint accepts the name of a CV file in PDF format, locates it within a predefined directory, 
+    and processes it to extract relevant information like personal details, skills, education, and work experience.
+
+    ### Request Body:
+    - **filename** (str): The name of the CV file to process. The file should already exist in the server's 'pdfs' directory.
+    
+    ### Response:
+    - **CVResponse**: A JSON object containing the extracted information. Each field represents a different aspect of the CV:
+      - `first_name`, `last_name`, `email`, `phone_number`, `location`: The candidate's personal details. If a detail is not found, returns `None`.
+      - `designations`, `college`, `degrees`, `work_experience`, `skills`: Arrays containing professional titles, colleges, degrees, work history, and skills. If no items are found, returns an `empty list ([])`.
+    - Fields are either strings or lists, depending on their nature. Strings return `None` if not found, and lists return `[]`.
+
+    ### Example Request 1:
+    ```json
+    {
+      "filename": "example1.pdf"
+    }
+    ```
+
+    ### Example Response 1:
+    ```json
+    {
+        "first_name": "Kathy",
+        "last_name": "James",
+        "email": "Kathyjames@email.com",
+        "phone_number": "(123) 456-7890",
+        "location": "Tulsa",
+        "designations": [
+            "Programmer"
+        ],
+        "college": [
+            "University of Alabama"
+        ],
+        "degrees": [
+            "B.S. Computer Science"
+        ],
+        "work_experience": [],
+        "skills": [
+            "JavaScript HTML/ CSS Django SQL REST APIs Angular.js React.js Jest Eclipse Java CAREER OBJECTIVE Graduate of"
+        ]
+    }
+    ```
+
+    ### Example Request 2:
+    ```json
+    {
+      "filename": "example3.pdf"
+    }
+    ```
+
+    ### Example Response 2:
+    ```json
+    {
+        "first_name": "Alice",
+        "last_name": "Clark",
+        "email": null,
+        "phone_number": null,
+        "location": "Delhi",
+        "designations": [
+            "AI / Machine Learning",
+            "Software Engineer"
+        ],
+        "college": [
+            "Indian Institute of Technology"
+        ],
+        "degrees": [],
+        "work_experience": [
+            "Microsoft"
+        ],
+        "skills": [
+            "Machine Learning, Natural Language Processing, and Big Data Handling ADDITIONAL INFORMATION Professional Skills • Excellent analytical, problem solving, communication, knowledge transfer and interpersonal skills with ability to interact with individuals at all the levels • Quick learner and maintains cordial relationship with project manager and team members and good performer both in team and independent job environments • Positive attitude towards superiors &amp; peers • Supervised junior developers throughout project lifecycle and provided technical assistance"
+        ]
+    }
+    ```
+
+    ### Raises:
+    - **HTTPException (400)**: If the file does not exist, is not readable, or is not a PDF.
+    - **HTTPException (500)**: If there is an error in processing the CV file.
+    
+    ### Limitations:
+    - Currently, only English language CVs from the Computer Science/IT field of work are supported.
+    """
     directory = "./pdfs"
-    filepath = os.path.join(directory, file.filename) + ".pdf"
+    filepath = os.path.join(directory, request.filename)
     
-    cv_text = extract_text(filepath)
-    text = cv_text
+    validate_file(filepath)
     
-    text = text.strip()
-    text = ' '.join(text.split())
-    
-    doc = nlp(text)
-    for ent in doc.ents:
-        print(ent.text, "       ->>>>>>>> ", ent.label_)
-    
-    #validate_file(filepath)
-    #cv_text = extract_cv_text(filepath)
-    #doc = nlp(cv_text) 
-    #first_name, last_name = extract_names(doc)
-    #email = extract_email(cv_text)
-    #phone_number = extract_phone_number(cv_text)
+    raw_text = extract_cv_text(filepath)
+    processed_text = ' '.join(raw_text.strip().split())
 
-    #return {"first_name": first_name, "last_name": last_name, "email": email, "phone_number": phone_number}
+    doc = nlp(processed_text)
+
+    first_name, last_name = extract_names(doc)
+    email = extract_email(processed_text)
+    phone_number = extract_phone_number(processed_text)
+    location = extract_location(doc)
+    designations = extract_designations(doc)
+    college = extract_college(doc)
+    degrees = extract_degrees(doc)
+    work_experience = extract_work_experience(doc)
+    skills = extract_skills(doc)
+
+    return {
+        "first_name": first_name,
+        "last_name": last_name,
+        "email": email,
+        "phone_number": phone_number,
+        "location": location,
+        "designations": designations,
+        "college": college,
+        "degrees": degrees,
+        "work_experience": work_experience,
+        "skills": skills
+    }
 
 # ---------------------------------
-# H E L P E R   F U N C T I O N S
+# HELPER FUNCTIONS
 # ---------------------------------
 
 def validate_file(filepath: str):
@@ -54,7 +167,6 @@ def validate_file(filepath: str):
     Args:
         filepath (str): The path of the file to validate.
     """
-    
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=400, detail="File does not exist.")
     
@@ -77,7 +189,6 @@ def extract_cv_text(filepath: str):
     Returns:
         str: The text of the CV.
     """
-    
     try:
         cv_text = extract_text(filepath)
     except Exception as e:
@@ -90,27 +201,31 @@ def extract_cv_text(filepath: str):
 
 def extract_names(doc: str):
     """
-    Extracts the first and last name from the given spaCy Doc.
+    Extracts the 'Name' entity from the given document.
 
-    Uses spaCy's Named Entity Recognition to extract the first and last name
-    from the CV text. If no names are found, returns None for both the first
-    and last name.
+    This function uses Named Entity Recognition (NER) to identify and extract the 'Name' entity from the document. 
+    The 'Name' entity is a block of text in the document that has been labeled as 'Name' by the NER model.
+
+    The function assumes that the first name is the first word in the 'Name' entity, and the last name is the last word.
 
     Args:
-        doc (str): The spaCy Doc to extract names from.
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
 
     Returns:
-        tuple: A tuple containing the first name and last name as strings.
+        tuple: A tuple containing the first name and last name found in the document. Both are strings. 
+               If no 'Name' entity is found, the function returns (None, None).
     """
-    
-    names = [ent.text for ent in doc.ents if ent.label_ == 'PERSON']
+    names = [ent.text for ent in doc.ents if ent.label_ == 'Name']
     if names:
         full_name = names[0].split(' ')
+        # Assume the first name is the first word
         first_name = full_name[0].lower().capitalize()
+        # If there's more than one word, assume the last name is the last word
         last_name = full_name[-1].lower().capitalize() if len(full_name) > 1 else None
     else:
         first_name, last_name = None, None
-
+        
     return first_name, last_name
 
 def extract_email(cv_text: str):
@@ -125,7 +240,6 @@ def extract_email(cv_text: str):
     Returns:
         str: The email address found in the CV, or None if no email address was found.
     """
-    
     email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     matches = re.findall(email_regex, cv_text)
     return matches[0] if matches else None
@@ -142,29 +256,114 @@ def extract_phone_number(cv_text: str):
     Returns:
         str: The phone number found in the CV, or None if no phone number was found.
     """
-    
     phone_regex = r'(?:\+\d{1,3}\s?)?(?:\(\d{3}\)|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}'
     matches = re.findall(phone_regex, cv_text)
-
     return matches[0] if matches else None
 
-def extract_skills(cv_text: str, skills_list: list):
+def extract_skills(doc: str):
     """
-    Extracts the skills from the given CV text.
+    Extracts the 'Skills' entities from the given document.
 
-    Checks if any of the skills in the skills list are present in the CV text.
+    This function uses Named Entity Recognition (NER) to identify and extract the 'Skills' entities from the document. 
+    The 'Skills' entities are blocks of text in the document that have been labeled as 'Skills' by the NER model.
 
     Args:
-        cv_text (str): The text of the CV.
-        skills_list (list): A list of known skills.
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
 
     Returns:
-        list: The skills found in the CV.
+        list: A list of the 'Skills' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'Skills' entities are found, the function returns an empty list.
     """
-    
-    cv_skills = []
-    for skill in skills_list:
-        if skill.lower() in cv_text.lower():
-            cv_skills.append(skill)
+    skills = [ent.text for ent in doc.ents if ent.label_ == 'Skills']
+    return list(set(skills)) if skills else []
 
-    return cv_skills
+
+def extract_designations(doc: str):
+    """
+    Extracts the unique 'Designation' entities from the given document.
+
+    This function uses Named Entity Recognition (NER) to identify and extract the 'Designation' entities from the document. 
+    The 'Designation' entities are blocks of text in the document that have been labeled as 'Designation' by the NER model.
+
+    Args:
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
+
+    Returns:
+        list: A list of the unique 'Designation' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'Designation' entities are found, the function returns an empty list.
+    """
+    designations = [ent.text for ent in doc.ents if ent.label_ == 'Designation']
+    return list(set(designations)) if designations else []
+
+def extract_college(doc: str):
+    """
+    Extracts the 'College Name' entities from the given document.
+
+    This function uses Named Entity Recognition (NER) to identify and extract the 'College Name' entities from the document. 
+    The 'College Name' entities are blocks of text in the document that have been labeled as 'College Name' by the NER model.
+
+    Args:
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
+
+    Returns:
+        list: A list of the 'College Name' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'College Name' entities are found, the function returns an empty list.
+    """
+    colleges = [ent.text for ent in doc.ents if ent.label_ == 'College Name']
+    return list(set(colleges)) if colleges else []
+
+def extract_location(doc: str):
+    """
+    Extracts the 'Location' entity from the given document.
+
+    This function uses Named Entity Recognition (NER) to identify and extract the 'Location' entity from the document. 
+    The 'Location' entity is a block of text in the document that has been labeled as 'Location' by the NER model.
+
+    Args:
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
+
+    Returns:
+        str: The 'Location' entity found in the document. If no 'Location' entity is found, the function returns None.
+    """
+    locations = [ent.text for ent in doc.ents if ent.label_ == 'Location']
+    return locations[0] if locations else None
+
+def extract_degrees(doc: str):
+    """
+    Extracts the 'Degree' entities from the given document.
+
+    This function uses Named Entity Recognition (NER) to identify and extract the 'Degree' entities from the document. 
+    The 'Degree' entities are blocks of text in the document that have been labeled as 'Degree' by the NER model.
+
+    Args:
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
+
+    Returns:
+        list: A list of the 'Degree' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'Degree' entities are found, the function returns an empty list.
+    """
+    degrees = [ent.text for ent in doc.ents if ent.label_ == 'Degree']
+    return list(set(degrees)) if degrees else []
+
+def extract_work_experience(doc: str):
+    """
+    Extracts the 'Companies worked at' entities from the given document.
+
+    This function uses Named Entity Recognition (NER) to identify and extract the 'Companies worked at' entities from the document. 
+    The 'Companies worked at' entities are blocks of text in the document that have been labeled as 'Companies worked at' by the NER model.
+
+    Args:
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
+
+    Returns:
+        list: A list of the 'Companies worked at' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'Companies worked at' entities are found, the function returns an empty list.
+    """
+    work_experience = [ent.text for ent in doc.ents if ent.label_ == 'Companies worked at']
+    return list(set(work_experience)) if work_experience else []
