@@ -81,6 +81,6 @@ The phpmyadmin client is accesible on `http://localhost:8080`.
 
 #### Creating a custom NER model
 
-To create a custom Named Entity Recognition (NER) model for parsing CVs, there is a Jupyter notebook `NER_custom_model.ipynb` that guides you through the process.
+To create a custom Named Entity Recognition (NER) model for parsing CVs, there is a Jupyter notebook `NER-custom-model.ipynb` that guides you through the process.
 
 ---

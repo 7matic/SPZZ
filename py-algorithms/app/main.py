@@ -23,14 +23,14 @@ class CVResponse(BaseModel):
 
 app = FastAPI()
 
-# nlp_old refers to an older model that is loaded from the path "./old_model" (uses train_data.json).
+# nlp_old refers to an older model that is loaded from the path "./old-model" (uses train_data.json).
 # This model has been found to perform better on the specific task of parsing CVs in our application, 
 # so it is still being used despite the availability of a newer model.
-nlp_old = spacy.load("./old_model")
-# nlp_new refers to a newer model that is loaded from the path "./new_model" (uses train_data2.json).
+nlp_old = spacy.load("./old-model")
+# nlp_new refers to a newer model that is loaded from the path "./new-model" (uses train_data2.json).
 # This model has shown better results in tests, however, for the specific task of parsing CVs in our application,
 # it has been found to perform worse than the older model.
-nlp_new = spacy.load("./new_model")
+nlp_new = spacy.load("./new-model")
 
 # ---------------------------------
 # ROUTES
