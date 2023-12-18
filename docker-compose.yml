@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8080:8080
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    depends_on:
+      - mysql
+
+  cv-parser:
+    build:
+      context: ./cv-parser
+      dockerfile: Dockerfile.dev
+    ports:
+      - 5000:5000
+    volumes:
+      - ./cv-parser:/code
+
+  sveltekit:
+    build: 
+      context: ./sveltekit
+      dockerfile: Dockerfile.dev
+    ports:
+      - 5173:5173
+    volumes:
+      - ./sveltekit:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
