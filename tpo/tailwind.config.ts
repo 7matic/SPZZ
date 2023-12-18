@@ -16,7 +16,12 @@ const config = {
 		)
 	],
 	theme: {
-		extend: {},
+		colors: {
+			primary: '#52D3D8',
+			secondary: '#3887BE',
+			accent: '#200E3A',
+			neutral: '#38419D',
+		}
 	},
 	plugins: [
 		skeleton({
