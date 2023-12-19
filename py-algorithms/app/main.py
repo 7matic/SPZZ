@@ -175,10 +175,9 @@ async def job_match(request: JobRequest):
     job_requirements = process_into_skills(request.job_description)
     
     user_skills = process_into_skills(request.user_data)
-    
+
     return {
-        "job_requirements": job_requirements,
-        "user_skills": user_skills        
+        "match_percentage": calculate_matching_score(user_skills, job_requirements)    
     }
     
 # ---------------------------------
@@ -452,3 +451,27 @@ def process_into_skills(data: str):
     
     # Keep only the unique ones
     return list(set(skills))
+
+def calculate_matching_score(user_skills, job_requirements):
+    """
+    Calculate the matching score between user skills and job requirements.
+
+    Args:
+        user_skills (list[str]): A list of skills extracted from the user's profile.
+        job_requirements (list[str]): A list of requirements (skills) extracted from the job description.
+
+    Returns:
+        float: The matching score as a percentage.
+    """
+
+    # Convert lists to sets for easier comparison
+    user_skills_set = set(user_skills)
+    job_requirements_set = set(job_requirements)
+
+    # Find common skills
+    common_skills = user_skills_set.intersection(job_requirements_set)
+
+    # Calculate matching score
+    matching_score = (len(common_skills) / len(job_requirements_set)) * 100
+    
+    return matching_score
