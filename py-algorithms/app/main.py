@@ -414,7 +414,22 @@ def extract_work_experience(doc: str):
     return list(set(work_experience)) if work_experience else []
 
 def process_into_skills(data: str):
-    
+    """
+    Processes user data to extract skills.
+
+    This function takes in user data as input and performs sanitization and processing to extract skills. 
+    The user data is expected to be a string containing information related to skills (job description, general overview of user profile...). 
+
+    The function combines the skills extracted with and without punctuation, converts them to lowercase, 
+    and removes unnecessary newlines. Finally, it returns a list of unique skills.
+
+    Args:
+        data (str): The user data containing information related to skills.
+
+    Returns:
+        List[str]: A list of unique skills extracted from the user data.
+
+    """
     # For the 'new model' every word must be on a new line - otherwise it underperforms
     skills = data.replace(" ", "\n")
     
