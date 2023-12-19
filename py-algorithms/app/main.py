@@ -5,7 +5,6 @@ from typing import List, Optional
 import spacy
 import os
 import re
-from openai import OpenAI
 
 class CVRequest(BaseModel):
     filename: str
@@ -171,7 +170,19 @@ async def read_cv_info(request: CVRequest):
 @app.post("/job_match")
 async def job_match(request: JobRequest):
 
-    return "TODO"
+    # TODO DATA MUST BE PROPERLY SANITIZED !!!
+    # We are using the new model for this task to parse skills from the job description
+    # New model must use "raw data", which means that all words are in separate lines
+    # Add \n to each space in the job description
+    
+    doc = nlp_new(request.job_description.replace(' ', '\n'))
+    
+    result = ""
+    for i in doc.ents:
+        result += i.text + " " + i.label_ + "\n"
+
+    return result
+    
 
 # ---------------------------------
 # HELPER FUNCTIONS
@@ -296,6 +307,24 @@ def extract_skills(doc: str):
               of the entity. If no 'Skills' entities are found, the function returns an empty list.
     """
     skills = [ent.text for ent in doc.ents if ent.label_ == 'Skills']
+    return list(set(skills)) if skills else []
+
+def extract_skills_job(doc: str):
+    """
+    Extracts the 'Skills' entities from the given document.
+
+    This function uses Named Entity Recognition (NER) to identify and extract the 'Skills' entities from the document. 
+    The 'Skills' entities are blocks of text in the document that have been labeled as 'Skills' by the NER model.
+
+    Args:
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
+
+    Returns:
+        list: A list of the 'Skills' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'Skills' entities are found, the function returns an empty list.
+    """
+    skills = [ent.text for ent in doc.ents if ent.label_ == 'SKILLS']
     return list(set(skills)) if skills else []
 
 
