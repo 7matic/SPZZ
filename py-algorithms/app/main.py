@@ -5,6 +5,8 @@ from typing import List, Optional
 import spacy
 import os
 import re
+import nltk
+import string
 
 class CVRequest(BaseModel):
     filename: str
@@ -170,18 +172,30 @@ async def read_cv_info(request: CVRequest):
 @app.post("/job_match")
 async def job_match(request: JobRequest):
 
-    # TODO DATA MUST BE PROPERLY SANITIZED !!!
-    # We are using the new model for this task to parse skills from the job description
-    # New model must use "raw data", which means that all words are in separate lines
-    # Add \n to each space in the job description
+    # For the 'new model' every word must be on a new line - otherwise it underperforms
+    job_requirements = request.job_description.replace(" ", "\n")
     
-    doc = nlp_new(request.job_description.replace(' ', '\n'))
+    # Extract skills from the user data - we keep punctation characters as they are
+    doc_with_punct = nlp_new(job_requirements)
+    # We extract the skills from job description
+    skills_with_punct = extract_skills_job(doc_with_punct)
+    # Now we remove the punctation characters and spaces so we will be able to have unique skills only
+    skills_with_punct = [skill.translate(str.maketrans('', '', string.punctuation + ' ')).replace(" ", "") for skill in skills_with_punct]
     
-    result = ""
-    for i in doc.ents:
-        result += i.text + " " + i.label_ + "\n"
-
-    return result
+    # This time we directly remove all the punctation characters and spaces from the job description
+    doc_without_punct = nlp_new(job_requirements.translate(str.maketrans('', '', string.punctuation)).replace(" ", ""))
+    # We extract the skills from job description
+    skills_without_punct = extract_skills_job(doc_without_punct)
+    
+    # We combine the skills
+    job_requirements = list(skills_with_punct + skills_without_punct)
+    # Make all the skills lowercase and remove unnecessary newlines
+    job_requirements = [skill[:-1].lower() if skill.endswith("\n") else skill.replace("\n", " ").lower() for skill in job_requirements]
+    
+    # Keep only the unique ones
+    job_requirements = list(set(job_requirements))
+    
+    return job_requirements
     
 
 # ---------------------------------
