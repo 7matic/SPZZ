@@ -5,6 +5,7 @@ from typing import List, Optional
 import spacy
 import os
 import re
+from openai import OpenAI
 
 class CVRequest(BaseModel):
     filename: str
@@ -20,6 +21,10 @@ class CVResponse(BaseModel):
     degrees: List[str] = []
     work_experience: List[str] = []
     skills: List[str] = []
+    
+class JobRequest(BaseModel):
+    job_description: str
+    user_data: str
 
 app = FastAPI()
 
@@ -162,6 +167,11 @@ async def read_cv_info(request: CVRequest):
         "work_experience": work_experience,
         "skills": skills
     }
+    
+@app.post("/job_match")
+async def job_match(request: JobRequest):
+
+    return "TODO"
 
 # ---------------------------------
 # HELPER FUNCTIONS
