@@ -290,7 +290,7 @@ def extract_phone_number(cv_text: str):
 
 def extract_skills_old_model(doc: str):
     """
-    Extracts the 'Skills' entities from the given document.
+    Extracts the 'Skills' entities from the given document using the 'old model'.
 
     This function uses Named Entity Recognition (NER) to identify and extract the 'Skills' entities from the document. 
     The 'Skills' entities are blocks of text in the document that have been labeled as 'Skills' by the NER model.
@@ -308,22 +308,21 @@ def extract_skills_old_model(doc: str):
 
 def extract_skills_new_model(doc: str):
     """
-    Extracts the 'Skills' entities from the given document.
+    Extracts the 'SKILLS' entities from the given document using the 'new model'.
 
-    This function uses Named Entity Recognition (NER) to identify and extract the 'Skills' entities from the document. 
-    The 'Skills' entities are blocks of text in the document that have been labeled as 'Skills' by the NER model.
+    This function uses Named Entity Recognition (NER) to identify and extract the 'SKILLS' entities from the document. 
+    The 'SKILLS' entities are blocks of text in the document that have been labeled as 'SKILLS' by the NER model.
 
     Args:
         doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
                    with entities labeled.
 
     Returns:
-        list: A list of the 'Skills' entities found in the document. Each entity is a string containing the text 
-              of the entity. If no 'Skills' entities are found, the function returns an empty list.
+        list: A list of the 'SKILLS' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'SKILLS' entities are found, the function returns an empty list.
     """
     skills = [ent.text for ent in doc.ents if ent.label_ == 'SKILLS']
     return list(set(skills)) if skills else []
-
 
 def extract_designations(doc: str):
     """
