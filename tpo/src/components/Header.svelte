@@ -1,4 +1,13 @@
-<script>
+<script lang="ts">
+    import auth from "../auth/authService.js";
+    import type {Auth0Client} from "@auth0/auth0-spa-js";
+    import {isAuthenticated} from "../auth/store";
+    import {onMount} from "svelte";
+
+    let auth0Client: Auth0Client;
+    onMount(async () => {
+        auth0Client = await auth.createClient();
+    });
     export let y;
 
     export let tabs = [
@@ -27,15 +36,27 @@
                 <p>{tab.name}</p>
             </a>
         {/each}
-        <button
-                class="blueShadow relative overflow-hidden px-5 py-2 group rounded-full bg-white text-slate-950"
-        >
-            <div
-                    class="absolute top-0 right-full w-full h-full bg-violet-400 opacity-20 group-hover:translate-x-full z-0 duration-200"
-            />
-            <a href="/login">
-                <h4 class="relative z-9">Prijavi se</h4>
-            </a>
-        </button>
+        {#if !$isAuthenticated}
+            <button
+                    class="blueShadow relative overflow-hidden px-5 py-2 group rounded-full bg-white text-slate-950"
+                    on:click={() => auth.loginWithPopup(auth0Client)}
+            >
+                <div
+                        class="absolute top-0 right-full w-full h-full bg-primary opacity-20 group-hover:translate-x-full z-0 duration-200"
+                />
+                <h4 class="relative z-9">Prijava</h4>
+            </button>
+        {/if}
+        {#if $isAuthenticated}
+            <button
+                    class="blueShadow relative overflow-hidden px-5 py-2 group rounded-full bg-white text-slate-950"
+                    on:click={() => auth.loginWithPopup(auth0Client)}
+            >
+                <div
+                        class="absolute top-0 right-full w-full h-full bg-primary opacity-20 group-hover:translate-x-full z-0 duration-200"
+                />
+                <h4 class="relative z-9">Odjava</h4>
+            </button>
+        {/if}
     </div>
 </header>
