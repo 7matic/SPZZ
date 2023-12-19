@@ -154,7 +154,7 @@ async def read_cv_info(request: CVRequest):
     college = extract_college(doc_old)
     degrees = extract_degrees(doc_old)
     work_experience = extract_work_experience(doc_old)
-    skills = extract_skills(doc_old)
+    skills = extract_skills_old_model(doc_old)
 
     return {
         "first_name": first_name,
@@ -172,32 +172,15 @@ async def read_cv_info(request: CVRequest):
 @app.post("/job_match")
 async def job_match(request: JobRequest):
 
-    # For the 'new model' every word must be on a new line - otherwise it underperforms
-    job_requirements = request.job_description.replace(" ", "\n")
+    job_requirements = process_into_skills(request.job_description)
     
-    # Extract skills from the user data - we keep punctation characters as they are
-    doc_with_punct = nlp_new(job_requirements)
-    # We extract the skills from job description
-    skills_with_punct = extract_skills_job(doc_with_punct)
-    # Now we remove the punctation characters and spaces so we will be able to have unique skills only
-    skills_with_punct = [skill.translate(str.maketrans('', '', string.punctuation + ' ')).replace(" ", "") for skill in skills_with_punct]
+    user_skills = process_into_skills(request.user_data)
     
-    # This time we directly remove all the punctation characters and spaces from the job description
-    doc_without_punct = nlp_new(job_requirements.translate(str.maketrans('', '', string.punctuation)).replace(" ", ""))
-    # We extract the skills from job description
-    skills_without_punct = extract_skills_job(doc_without_punct)
+    return {
+        "job_requirements": job_requirements,
+        "user_skills": user_skills        
+    }
     
-    # We combine the skills
-    job_requirements = list(skills_with_punct + skills_without_punct)
-    # Make all the skills lowercase and remove unnecessary newlines
-    job_requirements = [skill[:-1].lower() if skill.endswith("\n") else skill.replace("\n", " ").lower() for skill in job_requirements]
-    
-    # Keep only the unique ones
-    job_requirements = list(set(job_requirements))
-    
-    return job_requirements
-    
-
 # ---------------------------------
 # HELPER FUNCTIONS
 # ---------------------------------
@@ -305,7 +288,7 @@ def extract_phone_number(cv_text: str):
     matches = re.findall(phone_regex, cv_text)
     return matches[0] if matches else None
 
-def extract_skills(doc: str):
+def extract_skills_old_model(doc: str):
     """
     Extracts the 'Skills' entities from the given document.
 
@@ -323,7 +306,7 @@ def extract_skills(doc: str):
     skills = [ent.text for ent in doc.ents if ent.label_ == 'Skills']
     return list(set(skills)) if skills else []
 
-def extract_skills_job(doc: str):
+def extract_skills_new_model(doc: str):
     """
     Extracts the 'Skills' entities from the given document.
 
@@ -430,3 +413,28 @@ def extract_work_experience(doc: str):
     """
     work_experience = [ent.text for ent in doc.ents if ent.label_ == 'Companies worked at']
     return list(set(work_experience)) if work_experience else []
+
+def process_into_skills(data: str):
+    
+    # For the 'new model' every word must be on a new line - otherwise it underperforms
+    skills = data.replace(" ", "\n")
+    
+    # Extract skills from the provided data - we keep punctation characters as they are
+    doc_with_punct = nlp_new(skills)
+    # We extract the skills from data
+    skills_with_punct = extract_skills_new_model(doc_with_punct)
+    # Now we remove the punctation characters and spaces so we will be able to have unique skills only
+    skills_with_punct = [skill.translate(str.maketrans('', '', string.punctuation + ' ')).replace(" ", "") for skill in skills_with_punct]
+    
+    # This time we directly remove all the punctation characters and spaces from the data
+    doc_without_punct = nlp_new(skills.translate(str.maketrans('', '', string.punctuation)).replace(" ", ""))
+    # We extract the skills from data
+    skills_without_punct = extract_skills_new_model(doc_without_punct)
+    
+    # We combine the skills
+    skills = list(skills_with_punct + skills_without_punct)
+    # Make all the skills lowercase and remove unnecessary newlines
+    skills = [skill[:-1].lower() if skill.endswith("\n") else skill.replace("\n", " ").lower() for skill in skills]
+    
+    # Keep only the unique ones
+    return list(set(skills))
