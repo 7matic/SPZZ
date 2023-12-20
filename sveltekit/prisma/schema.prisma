@@ -1,0 +1,63 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  appliedTo     JobOffer[]
+  positions     Position[]
+}
+
+model Position {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  field       Field   @relation(fields: [fieldId], references: [id])
+  fieldId     Int
+  startDate   DateTime
+  endDate     DateTime
+  jobOffers   JobOffer[]
+  company     Company @relation(fields: [companyId], references: [id])
+  companyId   Int
+  heldBy      User[]
+}
+
+model Company {
+  id        Int     @id @default(autoincrement())
+  name     String
+  logo     String
+  positions Position[]
+}
+
+model JobOffer {
+    id               Int     @id @default(autoincrement())
+    position         Position @relation(fields: [positionId], references: [id])
+    positionId       Int
+    location         String
+    companyId        Int
+    minSalary        Int
+    maxSalary        Int
+    fieldId          Int    
+    applicants       User[]
+}
+
+model Skill {
+    id          Int @id @default(autoincrement())
+    name        String @unique
+    field       Field[]
+}
+
+model Field {
+    id          Int @id @default(autoincrement())
+    name        String @unique
+    trend       Int
+    skills      Skill[]
+    positions   Position[]
+}
