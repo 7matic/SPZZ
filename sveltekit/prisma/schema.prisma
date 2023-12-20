@@ -10,9 +10,10 @@ generator client {
 model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
-  name  String?
+  name  String
   appliedTo     JobOffer[]
   positions     Position[]
+  skills        Skill[]
 }
 
 model Position {
@@ -23,41 +24,43 @@ model Position {
   fieldId     Int
   startDate   DateTime
   endDate     DateTime
-  jobOffers   JobOffer[]
+  jobOffer    JobOffer?
   company     Company @relation(fields: [companyId], references: [id])
   companyId   Int
-  heldBy      User[]
+  heldBy      User?  @relation(fields: [heldById], references: [id])
+  isFilled    Boolean @default(false)
+  heldById    Int?
 }
 
 model Company {
-  id        Int     @id @default(autoincrement())
-  name     String
-  logo     String
-  positions Position[]
+  id          Int     @id @default(autoincrement())
+  name        String
+  logo        String
+  positions   Position[]
 }
 
 model JobOffer {
-    id               Int     @id @default(autoincrement())
+    id               Int      @id @default(autoincrement())
     position         Position @relation(fields: [positionId], references: [id])
-    positionId       Int
+    positionId       Int      @unique
     location         String
     companyId        Int
     minSalary        Int
     maxSalary        Int
-    fieldId          Int    
     applicants       User[]
+    active           Boolean @default(true)
 }
 
 model Skill {
-    id          Int @id @default(autoincrement())
-    name        String @unique
-    field       Field[]
+    id               Int @id @default(autoincrement())
+    name             String @unique
+    field            Field[]
+    usersWithSkill   User[]
 }
 
 model Field {
     id          Int @id @default(autoincrement())
     name        String @unique
-    trend       Int
     skills      Skill[]
     positions   Position[]
 }

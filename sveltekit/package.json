@@ -2,6 +2,9 @@
 	"name": "tpo",
 	"version": "0.0.1",
 	"private": true,
+	"prisma": {
+		"seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+	  },
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -25,5 +28,7 @@
 		"typescript": "^5.0.0",
 		"vite": "^4.4.2"
 	},
-	"type": "module"
+	"dependencies": {
+		"@prisma/client": "^5.7.1"
+	}
 }
