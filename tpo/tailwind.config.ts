@@ -17,8 +17,8 @@ const config = {
 	],
 	theme: {
 		colors: {
-			primary: '#52D3D8',
-			secondary: '#3887BE',
+			primary: '#3887BE',
+			secondary: '#52D3D8',
 			accent: '#200E3A',
 			neutral: '#38419D',
 		}

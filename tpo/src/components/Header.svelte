@@ -3,6 +3,7 @@
     import type {Auth0Client} from "@auth0/auth0-spa-js";
     import {isAuthenticated} from "../auth/store";
     import {onMount} from "svelte";
+    import logo from "../assets/logo-no-background.svg?raw";
 
     let auth0Client: Auth0Client;
     onMount(async () => {
@@ -24,7 +25,9 @@
             : " py-6 bg-transparent border-transparent")}
 >
     <h1 class="font-medium">
-        <b class="font-bold poppins">TPO</b> <span class="">gang</span>
+        <div class="w-[80px]">
+            {@html logo}
+        </div>
     </h1>
     <div class="sm:flex items-center gap-4 hidden">
         {#each tabs as tab, index}
