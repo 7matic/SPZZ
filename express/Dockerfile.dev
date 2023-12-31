@@ -1,0 +1,17 @@
+FROM node:20
+
+WORKDIR /app
+
+COPY package-lock.json package.json ./
+
+RUN npm install
+
+COPY . .
+
+ENV DATABASE_URL=mysql://root:daddyrozanc@mysql:3306/spzz
+
+RUN npx prisma generate
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
