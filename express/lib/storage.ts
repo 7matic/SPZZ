@@ -3,7 +3,7 @@ import multer from 'multer';
 // Set up storage for uploaded files
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, '/app/cv-parser/pdfs'); // Save uploaded files to the shared volume
+      cb(null, '/code/pdfs'); // Save uploaded files to the shared volume
     },
     filename: (req, file, cb) => {
       cb(null, Date.now() + '-' + file.originalname);

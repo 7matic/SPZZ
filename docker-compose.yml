@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   mysql:
+    container_name: mysql
     image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -11,6 +12,7 @@ services:
       - mysql-data:/var/lib/mysql
 
   phpmyadmin:
+    container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
     ports:
       - 8080:80
@@ -21,6 +23,7 @@ services:
       - mysql
 
   cv-parser:
+    container_name: cv-parser
     build:
       context: ./cv-parser
       dockerfile: Dockerfile.dev
@@ -28,10 +31,11 @@ services:
       - 5000:5000
     volumes:
       - ./cv-parser:/code
-      - ./cv-parser/pdfs:/app/cv-parser/pdfs
-      - shared-data:/app/cv-parser/pdfs:rw
+      - ./cv-parser/pdfs:/code/pdfs
+      - shared-data:/code/pdfs:rw
 
   sveltekit:
+    container_name: sveltekit
     build: 
       context: ./sveltekit
       dockerfile: Dockerfile.dev
@@ -44,15 +48,16 @@ services:
       NODE_ENV: development
 
   express:
+    container_name: express
     build:
       context: ./express
       dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
     volumes:
-      - ./express:/app
+      - ./express:/code
       - /app/node_modules
-      - shared-data:/app/cv-parser/pdfs:rw
+      - shared-data:/code/pdfs:rw
     environment:
       NODE_ENV: development
     depends_on:
