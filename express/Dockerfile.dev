@@ -8,9 +8,7 @@ RUN npm install
 
 COPY . .
 
-ENV DATABASE_URL=mysql://root:daddyrozanc@mysql:3306/spzz
-
-RUN npx prisma generate
+# ENV DATABASE_URL=mysql://root:daddyrozanc@mysql:3306/spzz
 
 EXPOSE 3000
 

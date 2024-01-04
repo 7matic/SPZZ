@@ -28,6 +28,8 @@ services:
       - 5000:5000
     volumes:
       - ./cv-parser:/code
+      - ./cv-parser/pdfs:/app/cv-parser/pdfs
+      - shared-data:/app/cv-parser/pdfs:rw
 
   sveltekit:
     build: 
@@ -50,8 +52,13 @@ services:
     volumes:
       - ./express:/app
       - /app/node_modules
+      - shared-data:/app/cv-parser/pdfs:rw
     environment:
       NODE_ENV: development
+    depends_on:
+      mysql:
+        condition: service_started
 
 volumes:
   mysql-data:
+  shared-data:

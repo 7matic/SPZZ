@@ -1,7 +1,8 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import prisma from '../lib/db'
 import express from 'express'
+// import upload from '../lib/storage'
+import upload from '../lib/storage';
 
-const prisma = new PrismaClient()
 const app = express()
 
 app.use(express.json())
@@ -31,6 +32,14 @@ app.post(`/user`, async (req, res) => {
   else
     res.json({error: "User not found!"})
 })
+
+// Set up a route for file uploads
+app.post('/upload', upload.single('file'), (req, res) => {
+  // Handle the uploaded file
+  res.json({ message: 'File uploaded successfully!' });
+});
+
+
 
 const server = app.listen(3000, () =>
   console.log(`
