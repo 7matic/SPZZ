@@ -5,7 +5,6 @@ from typing import List, Optional
 import spacy
 import os
 import re
-import nltk
 import string
 
 class CVRequest(BaseModel):
@@ -26,6 +25,9 @@ class CVResponse(BaseModel):
 class JobRequest(BaseModel):
     job_description: str
     user_data: str
+    
+class JobMatchResponse(BaseModel):
+    match_percentage: Optional[float]
 
 app = FastAPI()
 
@@ -169,15 +171,85 @@ async def read_cv_info(request: CVRequest):
         "skills": skills
     }
     
-@app.post("/job_match")
+@app.post("/job_match", response_model=JobMatchResponse, responses={
+    200: {"model": JobMatchResponse, "description": "Successful Response"},
+    400: {"description": "Bad Request - Invalid Input"},
+    500: {"description": "Internal Server Error"}
+})
 async def job_match(request: JobRequest):
+    '''
+    This endpoint calculates the match percentage between a user's skills and a job's requirements.
 
-    job_requirements = process_into_skills(request.job_description)
+    ### Request Body
     
-    user_skills = process_into_skills(request.user_data)
+    The request body should be a JSON object with the following properties:
+    - **job_description** (string): The job description from which the job requirements will be extracted.
+    - **user_data** (string): The user's data from which the user's skills will be extracted.
+    
+    ### Response
+    
+    The response is a JSON object with the following properties:
+    - **match_percentage** (float): The match percentage between the user's skills and the job's requirements. This is a number between 0 and 1, where 1 means the user's skills perfectly match the job's requirements and 0 means there's no match at all.
+    
+    ### Example Request 1:
+    ```json
+    {
+        "job_description": "We are looking for a Python developer with experience in Django and Flask.",
+        "user_data": "I am a Python developer with 3 years of experience in Django."
+    }
+    ```
+    
+    ### Example Response 1:
+    ```json
+    {
+        "match_percentage": 0.4
+    }
+    ```
+    
+    ### Example Request 2:
+    ```json
+    {
+        "job_description": "We are looking for a Python Developer to join our engineering team and help us develop and maintain various software products. Python Developer responsibilities include writing and testing code, debugging programs and integrating applications with third-party web services. To be successful in this role, you should have experience using server-side logic and work well in a team. Ultimately, you’ll build highly responsive web applications that align with our business needs.",
+        "user_data": "I am a Python developer with 5 years of experience. I have worked on several projects using Python, Django, and Flask. I have also worked with SQL and NoSQL databases. I am familiar with REST APIs and have experience with both Angular and React."
+    }
+    
+    ```
+    
+    ### Example Response 2:
+    ```json
+    {
+        "match_percentage": 0.5
+    }
+    ```
+    
+    ### Example Request 3:
+    ```json
+    {
+        "job_description": "Qualification: Expert-level front-end software development skills with JavaScript, ReactJS, NodeJS. Experience with data analytics, data visualization, BI tools. 4+ years of software development experience & strong troubleshooting and debugging skills Ability to drive projects end to end. Ability to produce high-quality software that is unit tested, code reviewed, and checked in regularly for continuous integration. Familiarity with backend Restful API development (experience with Django, Flask, Pyramid, or another RESTful development framework is desirable.) Solid background in complicated SQL & data analytics. Experience with SQL time series analytical queries, window functions, data modeling, and SQL query optimization is desirable. Zeal for learning and adopting new ideas and patterns Strong Computer Science fundamentals, data structures, algorithms, and software design",
+        "user_data": "TECHNICAL SKILLS Languages Tools and Libraries Python, C++, C, Java, Bash, HTML/CSS, JavaScript, SQL, Prolog, LISP PyTorch, TensorFlow, JAX, scikit-learn, Kaldi, OpenCV, Django, Git, LATEX POSITIONS OF RESPONSIBILITY Teaching Assistant - for Deep Multi-Task and Meta Learning (Head TA), Natural Language Processing with Deep Learning, Deep Reinforcement Learning, Computer Vision Foundations at Stanford University Reviewer - for CVPR 2022, ECCV 2022, ISBI 2022 and ICPR 2022 machine learning conferences Department Academic Mentor - for sophomore students in the Computer Science department, IIT Bombay"
+    }
+    ```
+    
+    ### Example Response 3:
+    ```json
+    {
+        "match_percentage": 0.16666666666666666
+    }
+    ```
+    
+    ### Raises:
+    - **HTTPException (400)**: If there is an error in processing the input data.
+    - **HTTPException (500)**: If there is an error in calculating the match percentage.
+    '''
+    try:
+        job_requirements = process_into_skills(request.job_description)
+        user_skills = process_into_skills(request.user_data)
+        match_percentage = calculate_matching_score(user_skills, job_requirements)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     return {
-        "match_percentage": calculate_matching_score(user_skills, job_requirements)    
+        "match_percentage": match_percentage
     }
     
 # ---------------------------------
@@ -452,26 +524,30 @@ def process_into_skills(data: str):
     # Keep only the unique ones
     return list(set(skills))
 
-def calculate_matching_score(user_skills, job_requirements):
+def calculate_matching_score(user_skills: List[str], job_requirements: List[str]) -> float:
     """
-    Calculate the matching score between user skills and job requirements.
+    Calculate the matching score between a user's skills and a job's requirements.
 
     Args:
-        user_skills (list[str]): A list of skills extracted from the user's profile.
-        job_requirements (list[str]): A list of requirements (skills) extracted from the job description.
+        user_skills (List[str]): A list of skills extracted from the user's profile.
+        job_requirements (List[str]): A list of requirements (skills) extracted from the job description.
 
     Returns:
-        float: The matching score as a percentage.
+        float: The matching score as a percentage. Returns 0 if job_requirements is empty.
     """
 
     # Convert lists to sets for easier comparison
     user_skills_set = set(user_skills)
     job_requirements_set = set(job_requirements)
 
+    # If there are no job requirements, return 0
+    if not job_requirements_set:
+        return 0.0
+
     # Find common skills
     common_skills = user_skills_set.intersection(job_requirements_set)
 
     # Calculate matching score
-    matching_score = (len(common_skills) / len(job_requirements_set)) * 100
+    matching_score = len(common_skills) / len(job_requirements_set)
     
     return matching_score
