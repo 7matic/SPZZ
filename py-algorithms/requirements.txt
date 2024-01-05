@@ -7,3 +7,4 @@ spacy_transformers
 nltk
 fuzzywuzzy
 python-Levenshtein
+pytest
