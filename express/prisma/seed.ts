@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 async function main() {
     const amadej = await prisma.user.create({
         data: {
-            name: 'Amadej',
             email: 'amadej.milicev99@gmail.com',
             auth0token: '12'
         }
@@ -17,19 +16,12 @@ async function main() {
         }
     });
 
-    const softwareEngineering = await prisma.field.create({
-        data: {
-            name: 'Software Engineering',
-        }
-    });
-
     const softwareDev = await prisma.position.create({
         data: {
             title: 'Software Developer',
             description: 'Develop software for Apple',
             startDate: new Date('2021-01-01'),
             endDate: new Date('2021-12-31'),
-            fieldId: softwareEngineering.id,
             companyId: apple.id,
         }
     });
@@ -74,7 +66,7 @@ async function main() {
                 connect: {
                     id: jobOffer.id
                 }
-            }
+            },
         },
     });
 }
