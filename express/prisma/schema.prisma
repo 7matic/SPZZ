@@ -29,17 +29,18 @@ model User {
 }
 
 model Position {
-  id          Int     @id @default(autoincrement())
-  title       String
-  description String
-  startDate   DateTime
-  endDate     DateTime
-  jobOffer    JobOffer?
-  company     Company @relation(fields: [companyId], references: [id])
-  companyId   Int
-  heldBy      User?  @relation(fields: [heldById], references: [id])
-  isFilled    Boolean @default(false)
-  heldById    Int?
+  id            Int     @id @default(autoincrement())
+  title         String
+  description   String
+  requirements  String  @db.LongText
+  startDate     DateTime
+  endDate       DateTime
+  jobOffer      JobOffer?
+  company       Company @relation(fields: [companyId], references: [id])
+  companyId     Int
+  heldBy        User?  @relation(fields: [heldById], references: [id])
+  isFilled      Boolean @default(false)
+  heldById      Int?
 }
 
 model Company {
@@ -54,7 +55,7 @@ model Match {
   jobOfferId Int
   user       User     @relation(fields: [userId], references: [id])
   userId     Int
-  score      Int
+  score      Decimal
 
   @@id([jobOfferId, userId])
 }

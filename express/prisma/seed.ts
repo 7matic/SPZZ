@@ -20,6 +20,7 @@ async function main() {
         data: {
             title: 'Software Developer',
             description: 'Develop software for Apple',
+            requirements: 'Seeking a Python developer with experience in web frameworks such as Django or Flask.',
             startDate: new Date('2021-01-01'),
             endDate: new Date('2021-12-31'),
             companyId: apple.id,
