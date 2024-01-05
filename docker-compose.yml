@@ -23,6 +23,7 @@ services:
       - mysql
 
   py-algorithms:
+    container_name: py-algorithms
     build:
       context: ./py-algorithms
       dockerfile: Dockerfile.dev
