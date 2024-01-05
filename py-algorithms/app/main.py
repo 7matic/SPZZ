@@ -2,9 +2,11 @@ from fastapi import FastAPI, HTTPException
 from pdfminer.high_level import extract_text
 from pydantic import BaseModel
 from typing import List, Optional
+from fuzzywuzzy import process
 import spacy
 import os
 import re
+import string
 
 class CVRequest(BaseModel):
     filename: str
@@ -20,17 +22,24 @@ class CVResponse(BaseModel):
     degrees: List[str] = []
     work_experience: List[str] = []
     skills: List[str] = []
+    
+class JobRequest(BaseModel):
+    job_description: str
+    user_data: str
+    
+class JobMatchResponse(BaseModel):
+    match_percentage: Optional[float]
 
 app = FastAPI()
 
-# nlp_old refers to an older model that is loaded from the path "./old_model" (uses train_data.json).
+# nlp_old refers to an older model that is loaded from the path "./old-model" (uses train_data.json).
 # This model has been found to perform better on the specific task of parsing CVs in our application, 
 # so it is still being used despite the availability of a newer model.
-nlp_old = spacy.load("./old_model")
-# nlp_new refers to a newer model that is loaded from the path "./new_model" (uses train_data2.json).
+nlp_old = spacy.load("./old-model")
+# nlp_new refers to a newer model that is loaded from the path "./new-model" (uses train_data2.json).
 # This model has shown better results in tests, however, for the specific task of parsing CVs in our application,
 # it has been found to perform worse than the older model.
-nlp_new = spacy.load("./new_model")
+nlp_new = spacy.load("./new-model")
 
 # ---------------------------------
 # ROUTES
@@ -148,7 +157,7 @@ async def read_cv_info(request: CVRequest):
     college = extract_college(doc_old)
     degrees = extract_degrees(doc_old)
     work_experience = extract_work_experience(doc_old)
-    skills = extract_skills(doc_old)
+    skills = extract_skills_old_model(doc_old)
 
     return {
         "first_name": first_name,
@@ -162,7 +171,88 @@ async def read_cv_info(request: CVRequest):
         "work_experience": work_experience,
         "skills": skills
     }
+    
+@app.post("/job_match", response_model=JobMatchResponse, responses={
+    200: {"model": JobMatchResponse, "description": "Successful Response"},
+    400: {"description": "Bad Request - Invalid Input"},
+    500: {"description": "Internal Server Error"}
+})
+async def job_match(request: JobRequest):
+    '''
+    This endpoint calculates the match percentage between a user's skills and a job's requirements.
 
+    ### Request Body
+    
+    The request body should be a JSON object with the following properties:
+    - **job_description** (string): The job description from which the job requirements will be extracted.
+    - **user_data** (string): The user's data from which the user's skills will be extracted.
+    
+    ### Response
+    
+    The response is a JSON object with the following properties:
+    - **match_percentage** (float): The match percentage between the user's skills and the job's requirements. This is a number between 0 and 1, where 1 means the user's skills perfectly match the job's requirements and 0 means there's no match at all.
+    
+    ### Example Request 1:
+    ```json
+    {
+        "job_description": "We are looking for a Python developer with experience in Django and Flask.",
+        "user_data": "I am a Python developer with 3 years of experience in Django."
+    }
+    ```
+    
+    ### Example Response 1:
+    ```json
+    {
+        "match_percentage": 0.58
+    }
+    ```
+    
+    ### Example Request 2:
+    ```json
+    {
+        "job_description": "We are looking for a Python Developer to join our engineering team and help us develop and maintain various software products. Python Developer responsibilities include writing and testing code, debugging programs and integrating applications with third-party web services. To be successful in this role, you should have experience using server-side logic and work well in a team. Ultimately, you’ll build highly responsive web applications that align with our business needs.",
+        "user_data": "I am a Python developer with 5 years of experience. I have worked on several projects using Python, Django, and Flask. I have also worked with SQL and NoSQL databases. I am familiar with REST APIs and have experience with both Angular and React."
+    }
+    
+    ```
+    
+    ### Example Response 2:
+    ```json
+    {
+        "match_percentage": 0.5
+    }
+    ```
+    
+    ### Example Request 3:
+    ```json
+    {
+        "job_description": "Qualification: Expert-level front-end software development skills with JavaScript, ReactJS, NodeJS. Experience with data analytics, data visualization, BI tools. 4+ years of software development experience & strong troubleshooting and debugging skills Ability to drive projects end to end. Ability to produce high-quality software that is unit tested, code reviewed, and checked in regularly for continuous integration. Familiarity with backend Restful API development (experience with Django, Flask, Pyramid, or another RESTful development framework is desirable.) Solid background in complicated SQL & data analytics. Experience with SQL time series analytical queries, window functions, data modeling, and SQL query optimization is desirable. Zeal for learning and adopting new ideas and patterns Strong Computer Science fundamentals, data structures, algorithms, and software design",
+        "user_data": "TECHNICAL SKILLS Languages Tools and Libraries Python, C++, C, Java, Bash, HTML/CSS, JavaScript, SQL, Prolog, LISP PyTorch, TensorFlow, JAX, scikit-learn, Kaldi, OpenCV, Django, Git, LATEX POSITIONS OF RESPONSIBILITY Teaching Assistant - for Deep Multi-Task and Meta Learning (Head TA), Natural Language Processing with Deep Learning, Deep Reinforcement Learning, Computer Vision Foundations at Stanford University Reviewer - for CVPR 2022, ECCV 2022, ISBI 2022 and ICPR 2022 machine learning conferences Department Academic Mentor - for sophomore students in the Computer Science department, IIT Bombay"
+    }
+    ```
+    
+    ### Example Response 3:
+    ```json
+    {
+        "match_percentage": 0.5277777777777778
+    }
+    ```
+    
+    ### Raises:
+    - **HTTPException (400)**: If there is an error in processing the input data.
+    - **HTTPException (500)**: If there is an error in calculating the match percentage.
+    '''
+    try:
+        job_requirements = process_into_skills(request.job_description)
+        user_skills = process_into_skills(request.user_data)
+        match_percentage = calculate_matching_score(user_skills, job_requirements)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {
+        "match_percentage": match_percentage
+    }
+    
 # ---------------------------------
 # HELPER FUNCTIONS
 # ---------------------------------
@@ -270,9 +360,9 @@ def extract_phone_number(cv_text: str):
     matches = re.findall(phone_regex, cv_text)
     return matches[0] if matches else None
 
-def extract_skills(doc: str):
+def extract_skills_old_model(doc: str):
     """
-    Extracts the 'Skills' entities from the given document.
+    Extracts the 'Skills' entities from the given document using the 'old model'.
 
     This function uses Named Entity Recognition (NER) to identify and extract the 'Skills' entities from the document. 
     The 'Skills' entities are blocks of text in the document that have been labeled as 'Skills' by the NER model.
@@ -288,6 +378,23 @@ def extract_skills(doc: str):
     skills = [ent.text for ent in doc.ents if ent.label_ == 'Skills']
     return list(set(skills)) if skills else []
 
+def extract_skills_new_model(doc: str):
+    """
+    Extracts the 'SKILLS' entities from the given document using the 'new model'.
+
+    This function uses Named Entity Recognition (NER) to identify and extract the 'SKILLS' entities from the document. 
+    The 'SKILLS' entities are blocks of text in the document that have been labeled as 'SKILLS' by the NER model.
+
+    Args:
+        doc (str): The text of the document. This should be the output of a Named Entity Recognition (NER) model, 
+                   with entities labeled.
+
+    Returns:
+        list: A list of the 'SKILLS' entities found in the document. Each entity is a string containing the text 
+              of the entity. If no 'SKILLS' entities are found, the function returns an empty list.
+    """
+    skills = [ent.text for ent in doc.ents if ent.label_ == 'SKILLS']
+    return list(set(skills)) if skills else []
 
 def extract_designations(doc: str):
     """
@@ -377,3 +484,80 @@ def extract_work_experience(doc: str):
     """
     work_experience = [ent.text for ent in doc.ents if ent.label_ == 'Companies worked at']
     return list(set(work_experience)) if work_experience else []
+
+def process_into_skills(data: str):
+    """
+    Processes user data to extract skills.
+
+    This function takes in user data as input and performs sanitization and processing to extract skills. 
+    The user data is expected to be a string containing information related to skills (job description, general overview of user profile...). 
+
+    The function combines the skills extracted with and without punctuation, converts them to lowercase, 
+    and removes unnecessary newlines. Finally, it returns a list of unique skills.
+
+    Args:
+        data (str): The user data containing information related to skills.
+
+    Returns:
+        List[str]: A list of unique skills extracted from the user data.
+
+    """
+    # For the 'new model' every word must be on a new line - otherwise it underperforms
+    skills = data.replace(" ", "\n")
+    
+    # Extract skills from the provided data - we keep punctation characters as they are
+    doc_with_punct = nlp_new(skills)
+    # We extract the skills from data
+    skills_with_punct = extract_skills_new_model(doc_with_punct)
+    # Now we remove the punctation characters and spaces so we will be able to have unique skills only
+    skills_with_punct = [skill.translate(str.maketrans('', '', string.punctuation + ' ')).replace(" ", "") for skill in skills_with_punct]
+    
+    # This time we directly remove all the punctation characters and spaces from the data
+    doc_without_punct = nlp_new(skills.translate(str.maketrans('', '', string.punctuation)).replace(" ", ""))
+    # We extract the skills from data
+    skills_without_punct = extract_skills_new_model(doc_without_punct)
+    
+    # We combine the skills
+    skills = list(skills_with_punct + skills_without_punct)
+    # Make all the skills lowercase and remove unnecessary newlines
+    skills = [skill[:-1].lower() if skill.endswith("\n") else skill.replace("\n", " ").lower() for skill in skills]
+    
+    # Keep only the unique ones
+    return list(set(skills))
+
+def calculate_matching_score(user_skills: List[str], job_requirements: List[str]) -> float:
+    """
+    Calculate the matching score between a user's skills and a job's requirements using fuzzy matching.
+
+    Args:
+        user_skills (List[str]): A list of skills extracted from the user's profile.
+        job_requirements (List[str]): A list of requirements (skills) extracted from the job description.
+
+    Returns:
+        float: The matching score as a percentage. Returns 0 if job_requirements is empty.
+    """
+
+    # If there are no job requirements, return 0
+    if not job_requirements:
+        return 0.0
+    
+    THRESHOLD = 60
+    total_score = 0
+    
+    for requirement in job_requirements:
+        
+        # Use FuzzyWuzzy to find the closest match to the requirement in the user's skills
+        result = process.extractOne(requirement, user_skills)
+        
+        if result and result[1] >= THRESHOLD:
+            match, score = result
+        else:
+            match, score = None, 0
+        
+        # Score is between 0 and 100
+        total_score += score
+
+    # The final score is the average of the individual match scores
+    matching_score = total_score / len(job_requirements)
+    
+    return matching_score / 100 

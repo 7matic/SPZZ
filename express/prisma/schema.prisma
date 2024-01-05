@@ -15,6 +15,7 @@ model User {
   appliedTo     JobOffer[]
   positions     Position[]
   skills        Skill[]
+  matches       Match[]
 }
 
 model Position {
@@ -40,6 +41,16 @@ model Company {
   positions   Position[]
 }
 
+model Match {
+  jobOffer   JobOffer @relation(fields: [jobOfferId], references: [id])
+  jobOfferId Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  score      Int
+
+  @@id([jobOfferId, userId])
+}
+
 model JobOffer {
     id               Int      @id @default(autoincrement())
     position         Position @relation(fields: [positionId], references: [id])
@@ -49,6 +60,7 @@ model JobOffer {
     minSalary        Int
     maxSalary        Int
     applicants       User[]
+    matches          Match[]
     active           Boolean @default(true)
 }
 

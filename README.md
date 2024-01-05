@@ -14,18 +14,7 @@
 
 ---
 
-## ❗Project Title: {Spletna platforma za zaposlovanje (SPZZ)}
-
-### 📝 Project Description: 
-- {TBD}
-
----
-
-### 🚀 Technologies: 
-- {TBD}
-
-### 🔖 Repository Structure: 
-- {TBD}
+## ❗Project Title: Spletna platforma za zaposlovanje (SPZZ)
 
 ### ✅ Installation Guide: 
 
@@ -81,6 +70,13 @@ The phpmyadmin client is accesible on `http://localhost:8080`.
 
 #### Creating a custom NER model
 
-To create a custom Named Entity Recognition (NER) model for parsing CVs, there is a Jupyter notebook `NER_custom_model.ipynb` that guides you through the process.
+To create a custom Named Entity Recognition (NER) model for parsing CVs, there is a Jupyter notebook `NER-custom-model.ipynb` that guides you through the process.
 
----
+#### Running tests (user-job matching algorithm)
+
+Make sure your application is running (```docker compose up```). Run:
+
+```bash
+docker exec -it spzz-py-algorithms-1 pytest -s ./tests/
+```
+Remember to replace ```spzz-py-algorithms-1``` with the actual name of your Docker container (run ```docker ps``` to find the corresponding name) if it doesn't work straight away.
