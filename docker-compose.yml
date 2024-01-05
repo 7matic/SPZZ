@@ -63,6 +63,8 @@ services:
     depends_on:
       mysql:
         condition: service_started
+      py-algorithms:
+        condition: service_started
 
 volumes:
   mysql-data:
