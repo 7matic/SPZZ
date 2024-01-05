@@ -5,3 +5,5 @@ pdfminer.six
 spacy
 spacy_transformers
 nltk
+fuzzywuzzy
+python-Levenshtein

@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pdfminer.high_level import extract_text
 from pydantic import BaseModel
 from typing import List, Optional
+from fuzzywuzzy import process
 import spacy
 import os
 import re
@@ -202,7 +203,7 @@ async def job_match(request: JobRequest):
     ### Example Response 1:
     ```json
     {
-        "match_percentage": 0.4
+        "match_percentage": 0.58
     }
     ```
     
@@ -233,7 +234,7 @@ async def job_match(request: JobRequest):
     ### Example Response 3:
     ```json
     {
-        "match_percentage": 0.16666666666666666
+        "match_percentage": 0.5277777777777778
     }
     ```
     
@@ -526,7 +527,7 @@ def process_into_skills(data: str):
 
 def calculate_matching_score(user_skills: List[str], job_requirements: List[str]) -> float:
     """
-    Calculate the matching score between a user's skills and a job's requirements.
+    Calculate the matching score between a user's skills and a job's requirements using fuzzy matching.
 
     Args:
         user_skills (List[str]): A list of skills extracted from the user's profile.
@@ -536,18 +537,27 @@ def calculate_matching_score(user_skills: List[str], job_requirements: List[str]
         float: The matching score as a percentage. Returns 0 if job_requirements is empty.
     """
 
-    # Convert lists to sets for easier comparison
-    user_skills_set = set(user_skills)
-    job_requirements_set = set(job_requirements)
-
     # If there are no job requirements, return 0
-    if not job_requirements_set:
+    if not job_requirements:
         return 0.0
-
-    # Find common skills
-    common_skills = user_skills_set.intersection(job_requirements_set)
-
-    # Calculate matching score
-    matching_score = len(common_skills) / len(job_requirements_set)
     
-    return matching_score
+    THRESHOLD = 60
+    total_score = 0
+    
+    for requirement in job_requirements:
+        
+        # Use FuzzyWuzzy to find the closest match to the requirement in the user's skills
+        result = process.extractOne(requirement, user_skills)
+        
+        if result and result[1] >= THRESHOLD:
+            match, score = result
+        else:
+            match, score = None, 0
+        
+        # Score is between 0 and 100
+        total_score += score
+
+    # The final score is the average of the individual match scores
+    matching_score = total_score / len(job_requirements)
+    
+    return matching_score / 100 
