@@ -18,14 +18,14 @@ services:
     depends_on:
       - mysql
 
-  cv-parser:
+  py-algorithms:
     build:
-      context: ./cv-parser
+      context: ./py-algorithms
       dockerfile: Dockerfile.dev
     ports:
       - 5000:5000
     volumes:
-      - ./cv-parser:/code
+      - ./py-algorithms:/code
 
   sveltekit:
     build: 

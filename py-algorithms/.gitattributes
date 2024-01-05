@@ -1,0 +1,2 @@
+old-model/** filter=lfs diff=lfs merge=lfs -text
+new-model/** filter=lfs diff=lfs merge=lfs -text
