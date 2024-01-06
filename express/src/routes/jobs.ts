@@ -96,4 +96,34 @@ jobsRouter.get("/apply_job", async (req, res) => {
   else res.json({ error: "Applicants not found!" });
 });
 
+jobsRouter.post("/choose-applicants", async (req, res) => {
+  const jobId = req.query.id;
+
+  const { user_id } = req.body;
+
+  const response = await prisma.jobOffer.update({
+    where: {
+      id: Number(jobId),
+    },
+    data: {
+      active: false,
+      position: {
+        update: {
+          heldBy: {
+            connect: {
+              id: Number(user_id),
+            }
+          },
+          isFilled: true,
+          startDate: new Date(),
+          endDate: undefined
+        }
+      },
+    },
+  });
+
+  if (response != null) res.json("Job updated!");
+  else res.json({ error: "Job not found!" });
+});
+
 export { jobsRouter };
