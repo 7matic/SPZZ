@@ -9,6 +9,13 @@ async function main() {
         }
     });
 
+    const john = await prisma.user.create({
+        data: {
+            email: 'john.doe@example.com',
+            auth0token: '34'
+        }
+    });
+
     const apple = await prisma.company.create({
         data: {
             name: 'Apple',
@@ -32,9 +39,40 @@ async function main() {
             positionId: softwareDev.id,
             companyId: apple.id,
             location: 'Cupertino, CA',
-            minSalary: 100000,
-            maxSalary: 150000,
+            salary: 100000,
             active: true
+        }
+    });
+
+    const dataAnalyst = await prisma.position.create({
+        data: {
+            title: 'Data Analyst',
+            description: 'Analyze data for Apple',
+            requirements: 'Seeking a Data Analyst with experience in SQL, Python, and data visualization tools.',
+            startDate: new Date('2022-01-01'),
+            endDate: new Date('2022-12-31'),
+            companyId: apple.id,
+        }
+    });
+
+    const jobOfferDataAnalyst = await prisma.jobOffer.create({
+        data: {
+            positionId: dataAnalyst.id,
+            companyId: apple.id,
+            location: 'Cupertino, CA',
+            salary: 80000,
+            active: true
+        }
+    });
+
+    const frontendDev = await prisma.position.create({
+        data: {
+            title: 'Frontend Developer',
+            description: 'Develop frontend applications for Apple',
+            requirements: 'Seeking a Frontend Developer with experience in React, JavaScript, and CSS.',
+            startDate: new Date('2022-01-01'),
+            endDate: new Date('2022-12-31'),
+            companyId: apple.id,
         }
     });
 
@@ -42,9 +80,7 @@ async function main() {
         where: { id: apple.id },
         data: {
             positions: {
-                connect: {
-                    id: softwareDev.id
-                }
+                connect: [{id: softwareDev.id}, {id: dataAnalyst.id}, {id: frontendDev.id}]
             }
         },
     });
@@ -57,6 +93,28 @@ async function main() {
                     id: jobOffer.id
                 }
             }
+        },
+    });
+
+    await prisma.position.update({
+        where: { id: dataAnalyst.id },
+        data: {
+            jobOffer: {
+                connect: {
+                    id: jobOfferDataAnalyst.id
+                }
+            }
+        },
+    });
+
+    await prisma.user.update({
+        where: { id: john.id },
+        data: {
+            appliedTo: {
+                connect: {
+                    id: jobOffer.id
+                }
+            },
         },
     });
 
