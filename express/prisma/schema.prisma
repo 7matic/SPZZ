@@ -4,8 +4,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native" ,"linux-arm64-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
 enum Role {
@@ -15,50 +15,52 @@ enum Role {
 }
 
 model User {
-  id            Int     @id @default(autoincrement())
-  auth0token      String? @unique
-  pdfFileName     String?
+  id          Int     @id @default(autoincrement())
+  auth0token  String? @unique
+  pdfFileName String?
 
-  email           String  @unique
-  firstName       String?
-  lastName        String?
-  phoneNumber     String?
-  location        String?
-  designations    String? @db.LongText
-  colleges        String? @db.LongText
-  degrees         String? @db.LongText
-  workExperience  String? @db.LongText
-  skills          String? @db.LongText
+  email          String  @unique
+  firstName      String?
+  lastName       String?
+  phoneNumber    String?
+  location       String?
+  designations   String? @db.LongText
+  colleges       String? @db.LongText
+  degrees        String? @db.LongText
+  workExperience String? @db.LongText
+  skills         String? @db.LongText
 
-  companyId       Int?
+  companyId Int?
 
-  appliedTo       JobOffer[]
-  positions       Position[]
-  matches         Match[]
+  appliedTo  JobOffer[]
+  matches    Match[]
+  Position Position?
+  positionId Int?
 
-  role            Role    @default(USER)
+  role     Role      @default(USER)
 }
 
 model Position {
-  id            Int     @id @default(autoincrement())
-  title         String
-  description   String
-  requirements  String  @db.LongText
-  startDate     DateTime
-  endDate       DateTime
-  jobOffer      JobOffer?
-  company       Company @relation(fields: [companyId], references: [id])
-  companyId     Int
-  heldBy        User?  @relation(fields: [heldById], references: [id])
-  isFilled      Boolean @default(false)
-  heldById      Int?
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String
+  requirements String    @db.LongText
+  startDate    DateTime
+  endDate      DateTime
+  jobOffer     JobOffer?
+  company      Company   @relation(fields: [companyId], references: [id])
+  companyId    Int
+
+  heldBy   User?   @relation(fields: [heldById], references: [id])
+  heldById Int?    @unique
+  isFilled Boolean @default(false)
 }
 
 model Company {
-  id          Int     @id @default(autoincrement())
-  name        String
-  logo        String
-  positions   Position[]
+  id        Int        @id @default(autoincrement())
+  name      String
+  logo      String
+  positions Position[]
 }
 
 model Match {
@@ -72,14 +74,14 @@ model Match {
 }
 
 model JobOffer {
-    id               Int      @id @default(autoincrement())
-    position         Position @relation(fields: [positionId], references: [id])
-    postedAt         DateTime @default(now())
-    positionId       Int      @unique
-    location         String
-    companyId        Int
-    salary           Int
-    applicants       User[]
-    matches          Match[]
-    active           Boolean @default(true)
+  id         Int      @id @default(autoincrement())
+  position   Position @relation(fields: [positionId], references: [id])
+  postedAt   DateTime @default(now())
+  positionId Int      @unique
+  location   String
+  companyId  Int
+  salary     Int
+  applicants User[]
+  matches    Match[]
+  active     Boolean  @default(true)
 }
