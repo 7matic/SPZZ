@@ -1,0 +1,43 @@
+_id: req_6b1b51cb19c440c59dcd087a98bb877c
+type: Request
+parentId: wrk_168737022af9496989c035f875222f8a
+modified: 1704543867221
+created: 1704541113510
+url: http://localhost:3000/jobs/
+name: JOBS
+description: ""
+method: GET
+body:
+  mimeType: application/json
+  text: ""
+parameters:
+  - id: pair_5a65cb3df78b44c8b2bcd711561b6368
+    name: sort
+    value: salary
+    description: ""
+  - id: pair_81f540321429437a9ae7d43f12507866
+    name: sort_mode
+    value: desc
+    description: ""
+  - id: pair_1bcc4d1299de47a3b78345a48fed26aa
+    name: page
+    value: "0"
+    description: ""
+  - id: pair_df39c90eab2243738f802ca5ca5df424
+    name: user_id
+    value: "1"
+    description: ""
+headers:
+  - name: Content-Type
+    value: application/json
+  - name: User-Agent
+    value: insomnia/8.5.1
+authentication: {}
+metaSortKey: -1704541113510
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

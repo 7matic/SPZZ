@@ -1,0 +1,34 @@
+_id: req_dcb513d14ff64a2389dbea0b2475a496
+type: Request
+parentId: wrk_168737022af9496989c035f875222f8a
+modified: 1704547014119
+created: 1704544982705
+url: http://localhost:3000/jobs/
+name: JOB
+description: ""
+method: POST
+body:
+  mimeType: application/json
+  text: |-
+    {
+        "companyId": 1,
+        "positionId": 3,
+        "salary": 50000,
+        "active": true,
+        "location": "New York"
+    }
+parameters: []
+headers:
+  - name: Content-Type
+    value: application/json
+  - name: User-Agent
+    value: insomnia/8.5.1
+authentication: {}
+metaSortKey: -1704544982705
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

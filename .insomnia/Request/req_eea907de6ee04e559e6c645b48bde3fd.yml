@@ -1,0 +1,27 @@
+_id: req_eea907de6ee04e559e6c645b48bde3fd
+type: Request
+parentId: wrk_168737022af9496989c035f875222f8a
+modified: 1704559104613
+created: 1704558750829
+url: http://localhost:3000/user/user/
+name: USER
+description: ""
+method: GET
+body: {}
+parameters:
+  - id: pair_4ba4c13cebc8495083c1a3430eaf95ea
+    name: token
+    value: "12"
+    description: ""
+headers:
+  - name: User-Agent
+    value: insomnia/2023.5.8
+authentication: {}
+metaSortKey: -1704558750829
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global
