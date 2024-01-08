@@ -12,7 +12,9 @@ const jobsRouter = express.Router();
 jobsRouter.get("/", async (req, res) => {
   const { user_id, sort, sort_mode, page } = req.query;
 
-  await matchAllJobOffersForUser(String(user_id));
+  if(sort_mode == 'job_match')
+    await matchAllJobOffersForUser(String(user_id));
+
   const jobs = await getSortedJobsWithMatches(
     String(user_id),
     String(sort),
