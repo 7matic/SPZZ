@@ -16,7 +16,7 @@ type PyResponse = {
 export async function uploadFile(filename: string) {
     await prisma.user.update({
         where: {
-            auth0token: String(12)
+            id: Number(1)
         },
         data: {
             pdfFileName: filename
@@ -35,7 +35,7 @@ export async function uploadFile(filename: string) {
 
     await prisma.user.update({
         where: {
-            auth0token: String(12)
+            id: Number(1)
         },
         data: {
             firstName: responseJson.first_name,
