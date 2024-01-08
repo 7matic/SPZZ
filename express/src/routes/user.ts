@@ -29,8 +29,8 @@ userRouter.post(`/user`, async (req, res) => {
         res.json({ error: "User not found!" })
 })
 
-userRouter.get(`/user/:id`, async (req, res) => {
-    const { id } = req.params
+userRouter.get(`/user`, async (req, res) => {
+    const { id } = req.query;
 
     const result = await prisma.user.findUnique({
         where: {
@@ -42,10 +42,6 @@ userRouter.get(`/user/:id`, async (req, res) => {
         res.json(result)
     else
         res.json({ error: "User not found!" })
-});
-
-userRouter.put(`/user/:id`, async (req, res) => {
-
 });
 
 export { userRouter };
