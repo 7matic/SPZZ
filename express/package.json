@@ -3,7 +3,8 @@
     "version": "1.0.0",
     "license": "MIT",
     "scripts": {
-        "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+        "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+        "reset": "npx prisma db push --force-reset && npx prisma --url db seed"
     },
     "dependencies": {
         "@prisma/client": "5.7.1",
