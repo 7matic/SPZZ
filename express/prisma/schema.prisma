@@ -34,10 +34,13 @@ model User {
 
   appliedTo  JobOffer[]
   matches    Match[]
-  Position Position?
+  Position   Position?
   positionId Int?
 
-  role     Role      @default(USER)
+  senderMessages    Message[] @relation("sender")
+  recipientMessages Message[] @relation("recipient")
+
+  role Role @default(USER)
 }
 
 model Position {
@@ -48,7 +51,7 @@ model Position {
   startDate    DateTime
   endDate      DateTime
   jobOffer     JobOffer?
-  company      Company   @relation(fields: [companyId], references: [id])
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId    Int
 
   heldBy   User?   @relation(fields: [heldById], references: [id])
@@ -60,13 +63,14 @@ model Company {
   id        Int        @id @default(autoincrement())
   name      String
   logo      String
+  location  String
   positions Position[]
 }
 
 model Match {
   jobOffer   JobOffer @relation(fields: [jobOfferId], references: [id], onDelete: Cascade)
   jobOfferId Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
   score      Decimal
 
@@ -75,7 +79,7 @@ model Match {
 
 model JobOffer {
   id         Int      @id @default(autoincrement())
-  position   Position @relation(fields: [positionId], references: [id])
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
   postedAt   DateTime @default(now())
   positionId Int      @unique
   location   String
@@ -84,4 +88,14 @@ model JobOffer {
   applicants User[]
   matches    Match[]
   active     Boolean  @default(true)
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  content     String   @db.Text
+  sender      User     @relation("sender", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId    Int
+  recipient   User     @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipientId Int
 }
