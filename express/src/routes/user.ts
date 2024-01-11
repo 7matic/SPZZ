@@ -1,5 +1,6 @@
 import express from 'express';
 import prisma from '../../lib/db';
+// import { checkJwt } from '..';
 
 const userRouter = express.Router();
 
@@ -29,7 +30,7 @@ userRouter.post(`/user`, async (req, res) => {
         res.json({ error: "User not found!" })
 })
 
-userRouter.get(`/user`, async (req, res) => {
+userRouter.get(`/`, async (req, res) => {
     const { id } = req.query;
 
     const result = await prisma.user.findUnique({
