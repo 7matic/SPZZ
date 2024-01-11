@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCompany, postCompany } from '../controllers/company';
+import { getCompany, getPositions, postCompany } from '../controllers/company';
 
 const companyRouter = express.Router();
 
@@ -23,6 +23,17 @@ companyRouter.post('/create', async (req, res) => {
         res.json(company)
     else
         res.json({ error: "Company not found!" })
+});
+
+companyRouter.get('/positions', async (req, res) => {
+    const { id } = req.query;
+
+    const positions = await getPositions(String(id));
+
+    if (positions != null)
+        res.json(positions)
+    else
+        res.json({ error: "Positions not found!" })
 });
 
 export { companyRouter };

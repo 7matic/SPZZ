@@ -19,3 +19,13 @@ export async function getCompany(id: string) {
     })
     return company;
 }
+
+export async function getPositions(id: string) {
+    const positions = await prisma.position.findMany({
+        where: {
+            companyId: Number(id),
+        }
+    })
+
+    return positions;
+}
