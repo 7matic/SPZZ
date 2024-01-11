@@ -1,0 +1,97 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int     @id @default(autoincrement())
+  auth0token      String? @unique
+  pdfFileName     String?
+
+  email           String  @unique
+  firstName       String?
+  lastName        String?
+  phoneNumber     String?
+  location        String?
+  designations    Designation[]
+  colleges        College[]
+  degrees         Degree[]
+  workExperience  String?
+  skills          Skill[]
+
+  appliedTo       JobOffer[]
+  positions       Position[]
+  matches         Match[]
+}
+
+model Designation{
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+  users         User[]
+}
+
+model College {
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+  users         User[]
+}
+
+model Degree {
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+  users         User[]
+}
+
+model Skill {
+    id               Int @id @default(autoincrement())
+    name             String @unique
+    users   User[]
+}
+
+model Position {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  jobOffer    JobOffer?
+  company     Company @relation(fields: [companyId], references: [id])
+  companyId   Int
+  heldBy      User?  @relation(fields: [heldById], references: [id])
+  isFilled    Boolean @default(false)
+  heldById    Int?
+}
+
+model Company {
+  id          Int     @id @default(autoincrement())
+  name        String
+  logo        String
+  positions   Position[]
+}
+
+model Match {
+  jobOffer   JobOffer @relation(fields: [jobOfferId], references: [id])
+  jobOfferId Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  score      Int
+
+  @@id([jobOfferId, userId])
+}
+
+model JobOffer {
+    id               Int      @id @default(autoincrement())
+    position         Position @relation(fields: [positionId], references: [id])
+    positionId       Int      @unique
+    location         String
+    companyId        Int
+    minSalary        Int
+    maxSalary        Int
+    applicants       User[]
+    matches          Match[]
+    active           Boolean @default(true)
+}

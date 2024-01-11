@@ -1,0 +1,101 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+enum Role {
+  ADMIN
+  USER
+  COMPANY
+}
+
+model User {
+  id          Int     @id @default(autoincrement())
+  auth0token  String? @unique
+  pdfFileName String?
+
+  email          String  @unique
+  firstName      String?
+  lastName       String?
+  phoneNumber    String?
+  location       String?
+  designations   String? @db.LongText
+  colleges       String? @db.LongText
+  degrees        String? @db.LongText
+  workExperience String? @db.LongText
+  skills         String? @db.LongText
+
+  companyId Int?
+
+  appliedTo  JobOffer[]
+  matches    Match[]
+  Position   Position?
+  positionId Int?
+
+  senderMessages    Message[] @relation("sender")
+  recipientMessages Message[] @relation("recipient")
+
+  role Role @default(USER)
+}
+
+model Position {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String
+  requirements String    @db.LongText
+  startDate    DateTime
+  endDate      DateTime
+  jobOffer     JobOffer?
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId    Int
+
+  heldBy   User?   @relation(fields: [heldById], references: [id])
+  heldById Int?    @unique
+  isFilled Boolean @default(false)
+}
+
+model Company {
+  id        Int        @id @default(autoincrement())
+  name      String
+  logo      String
+  location  String
+  positions Position[]
+}
+
+model Match {
+  jobOffer   JobOffer @relation(fields: [jobOfferId], references: [id], onDelete: Cascade)
+  jobOfferId Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  score      Decimal
+
+  @@id([jobOfferId, userId])
+}
+
+model JobOffer {
+  id         Int      @id @default(autoincrement())
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  postedAt   DateTime @default(now())
+  positionId Int      @unique
+  location   String
+  companyId  Int
+  salary     Int
+  applicants User[]
+  matches    Match[]
+  active     Boolean  @default(true)
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  content     String   @db.Text
+  sender      User     @relation("sender", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId    Int
+  recipient   User     @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipientId Int
+}

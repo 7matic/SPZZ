@@ -2,13 +2,17 @@ version: '3.8'
 
 services:
   mysql:
+    container_name: mysql
     image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
     volumes:
       - mysql-data:/var/lib/mysql
 
   phpmyadmin:
+    container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
     ports:
       - 8080:80
@@ -19,6 +23,7 @@ services:
       - mysql
 
   py-algorithms:
+    container_name: py-algorithms
     build:
       context: ./py-algorithms
       dockerfile: Dockerfile.dev
@@ -26,8 +31,11 @@ services:
       - 5000:5000
     volumes:
       - ./py-algorithms:/code
+      - ./py-algorithms/pdfs:/code/pdfs
+      - shared-data:/code/pdfs:rw
 
   sveltekit:
+    container_name: sveltekit
     build: 
       context: ./sveltekit
       dockerfile: Dockerfile.dev
@@ -39,5 +47,25 @@ services:
     environment:
       NODE_ENV: development
 
+  express:
+    container_name: express
+    build:
+      context: ./express
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - ./express:/code
+      - /app/node_modules
+      - shared-data:/code/pdfs:rw
+    environment:
+      NODE_ENV: development
+    depends_on:
+      mysql:
+        condition: service_started
+      py-algorithms:
+        condition: service_started
+
 volumes:
   mysql-data:
+  shared-data:

@@ -1,0 +1,35 @@
+_id: req_2c7d1b4042104ef8af1576ae37e5ff7d
+type: Request
+parentId: wrk_168737022af9496989c035f875222f8a
+modified: 1704548074094
+created: 1704539140642
+url: http://localhost:3000/jobs/apply_job
+name: APPLY_JOB
+description: ""
+method: POST
+body:
+  mimeType: application/json
+  text: |-
+    {
+    	"user_id": "1",
+    	"applied": "true"
+    }
+parameters:
+  - id: pair_b7ec133369be40a38efaff75f1b6b10f
+    name: id
+    value: "4"
+    description: ""
+headers:
+  - name: Content-Type
+    value: application/json
+  - name: User-Agent
+    value: insomnia/8.5.1
+authentication: {}
+metaSortKey: -1704539140642
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global
