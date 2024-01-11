@@ -18,9 +18,11 @@ export async function getSortedJobsWithMatches(
     include: {
       position: {
         select: {
+          title: true,
           company: {
             select: {
               name: true,
+              logo: true,
             },
           },
         },
