@@ -4,7 +4,7 @@
     "license": "MIT",
     "scripts": {
         "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-        "reset": "npx prisma db push --schema prisma/seed.prisma --force-reset && npx prisma db seed && npx prisma generate"
+        "reset": "npm install && npx prisma db push --schema prisma/seed.prisma --force-reset && npx prisma db seed && npx prisma generate"
     },
     "dependencies": {
         "@prisma/client": "5.7.1",
