@@ -17,8 +17,13 @@ authRouter.post(`/login`, async (req, res) => {
             id: true,
             email: true,
             hash: true,
-            companyId: true,
-            role: true
+            role: true,
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            }
         }
     });
 
@@ -30,7 +35,7 @@ authRouter.post(`/login`, async (req, res) => {
 
     if (!isValid) return res.status(400).json({ "error": "Invalid password!" });
 
-    const token = generateAccessToken(user.id, user.role, user.companyId ? user.companyId : undefined);
+    const token = generateAccessToken(user.id, user.role, user.company?.id ? user.company.id : undefined);
     return res.json({ "accessToken": token });
 });
 
@@ -48,8 +53,13 @@ authRouter.post(`/register`, async (req, res) => {
             select: {
                 id: true,
                 email: true,
-                companyId: true,
-                role: true
+                role: true,
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                }
             }
         });
     }
