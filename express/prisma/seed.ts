@@ -4,11 +4,121 @@ import { hashPassword } from "../lib/auth";
 const prisma = new PrismaClient();
 
 async function main() {
+  const user1 = await prisma.user.create({
+    data: {
+      email: "john.doe@gmail.com",
+      hash: await hashPassword("password"), 
+      firstName: "John",
+      lastName: "Doe",
+      phoneNumber: "555-1234",
+      location: "San Francisco, CA",
+    },
+  });
+  const user2 = await prisma.user.create({
+    data: {
+      email: "jane.smith@yahoo.com",
+      hash: await hashPassword("password"),
+      firstName: "Jane",
+      lastName: "Smith",
+      phoneNumber: "555-5678",
+      location: "Seattle, WA",
+    },
+  });
+  const user3 = await prisma.user.create({
+    data: {
+      email: "mike.jones@hotmail.com",
+      hash: await hashPassword("krneki"),
+      firstName: "Mike",
+      lastName: "Jones",
+      phoneNumber: "555-9876",
+      location: "Cupertino, CA",
+    },
+  });
+  const user4 = await prisma.user.create({
+    data: {
+      email: "lisa.white@gmail.com",
+      hash: await hashPassword("password12"),
+      firstName: "Lisa",
+      lastName: "White",
+      phoneNumber: "555-4321",
+      location: "Redmond, WA",
+    },
+  });
+  const user5 = await prisma.user.create({
+    data: {
+      email: "alex.brown@yahoo.com",
+      hash: await hashPassword("password123"),
+      firstName: "Alex",
+      lastName: "Brown",
+      phoneNumber: "555-8765",
+      location: "Menlo Park, CA",
+    },
+  });
+
+  const user6 = await prisma.user.create({
+    data: {
+      email: "sam.wilson@gmail.com",
+      hash: await hashPassword("pass123"),
+      firstName: "Sam",
+      lastName: "Wilson",
+      phoneNumber: "555-1357",
+      location: "Los Angeles, CA",
+    },
+  });
+  
+  const user7 = await prisma.user.create({
+    data: {
+      email: "emily.jones@yahoo.com",
+      hash: await hashPassword("abc@123"),
+      firstName: "Emily",
+      lastName: "Jones",
+      phoneNumber: "555-2468",
+      location: "Portland, OR",
+    },
+  });
+  
+  const user8 = await prisma.user.create({
+    data: {
+      email: "david.smith@hotmail.com",
+      hash: await hashPassword("securePass"),
+      firstName: "David",
+      lastName: "Smith",
+      phoneNumber: "555-3691",
+      location: "San Diego, CA",
+    },
+  });
+  
+  const user9 = await prisma.user.create({
+    data: {
+      email: "sara.davis@gmail.com",
+      hash: await hashPassword("mySecret"),
+      firstName: "Sara",
+      lastName: "Davis",
+      phoneNumber: "555-4747",
+      location: "Austin, TX",
+    },
+  });
+  
+  const user10 = await prisma.user.create({
+    data: {
+      email: "robert.jackson@yahoo.com",
+      hash: await hashPassword("password321"),
+      firstName: "Robert",
+      lastName: "Jackson",
+      phoneNumber: "555-5858",
+      location: "Denver, CO",
+    },
+  });
+  
+
   const company1 = await prisma.company.create({
     data: {
       name: "Google",
       logo: "https://seeklogo.com/images/G/google-logo-28FA7991AF-seeklogo.com.png",
       location: "Austin, TX",
+      user: {
+        connect: { id: user6.id },
+      }
     },
   });
   const company2 = await prisma.company.create({
@@ -16,6 +126,9 @@ async function main() {
       name: "Microsoft",
       logo: "https://logowik.com/content/uploads/images/microsoft44289.logowik.com.webp",
       location: "Dallas, TX",
+      user: {
+        connect: { id: user7.id },
+      }
     },
   });
   const company3 = await prisma.company.create({
@@ -23,6 +136,9 @@ async function main() {
       name: "Apple Inc.",
       logo: "https://cdn.freebiesupply.com/images/thumbs/2x/apple-logo.png",
       location: "Cupertino, CA",
+      user: {
+        connect: { id: user8.id },
+      }
     },
   });
   const company4 = await prisma.company.create({
@@ -30,6 +146,9 @@ async function main() {
       name: "Amazon",
       logo: "https://www.svgrepo.com/show/112049/amazon-logo.svg",
       location: "New York, NY",
+      user: {
+        connect: { id: user9.id },
+      }
     },
   });
   const company5 = await prisma.company.create({
@@ -37,6 +156,9 @@ async function main() {
       name: "Facebook",
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Facebook_Logo_2023.png/600px-Facebook_Logo_2023.png",
       location: "Miami, FL",
+      user: {
+        connect: { id: user10.id },
+      }
     },
   });
 
@@ -238,58 +360,6 @@ async function main() {
       location: "Cupertino, CA",
       salary: 95000,
       active: true,
-    },
-  });
-
-  const user1 = await prisma.user.create({
-    data: {
-      email: "john.doe@gmail.com",
-      hash: await hashPassword("password"), 
-      companyId: company1.id,
-      firstName: "John",
-      lastName: "Doe",
-      phoneNumber: "555-1234",
-      location: "San Francisco, CA",
-    },
-  });
-  const user2 = await prisma.user.create({
-    data: {
-      email: "jane.smith@yahoo.com",
-      hash: await hashPassword("password"),
-      firstName: "Jane",
-      lastName: "Smith",
-      phoneNumber: "555-5678",
-      location: "Seattle, WA",
-    },
-  });
-  const user3 = await prisma.user.create({
-    data: {
-      email: "mike.jones@hotmail.com",
-      hash: await hashPassword("krneki"),
-      firstName: "Mike",
-      lastName: "Jones",
-      phoneNumber: "555-9876",
-      location: "Cupertino, CA",
-    },
-  });
-  const user4 = await prisma.user.create({
-    data: {
-      email: "lisa.white@gmail.com",
-      hash: await hashPassword("password12"),
-      firstName: "Lisa",
-      lastName: "White",
-      phoneNumber: "555-4321",
-      location: "Redmond, WA",
-    },
-  });
-  const user5 = await prisma.user.create({
-    data: {
-      email: "alex.brown@yahoo.com",
-      hash: await hashPassword("password123"),
-      firstName: "Alex",
-      lastName: "Brown",
-      phoneNumber: "555-8765",
-      location: "Menlo Park, CA",
     },
   });
 

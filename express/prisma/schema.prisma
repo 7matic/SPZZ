@@ -30,7 +30,7 @@ model User {
   workExperience String? @db.LongText
   skills         String? @db.LongText
 
-  companyId Int?
+  company Company?
 
   appliedTo  JobOffer[]
   matches    Match[]
@@ -65,6 +65,9 @@ model Company {
   logo      String
   location  String
   positions Position[]
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
 }
 
 model Match {
