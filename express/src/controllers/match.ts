@@ -4,18 +4,22 @@ type PyResponse = {
     match_percentage: number;
 };
 
-export async function   matchAllJobOffersForUser(userId: string){
+export async function matchAllJobOffersForUser(userId: number) {
     const jobOffers = await prisma.jobOffer.findMany({
-        include:{
+        include: {
             position: true,
         }
     });
 
     const user = await prisma.user.findUnique({
         where: {
-            id: Number(userId)
+            id: userId
         }
     });
+
+    if (!user?.skills) {
+        return null;
+    }
 
     jobOffers.forEach(async (jobOffer) => {
         const match_percentage = await fetch('http://py-algorithms:5000/job_match', {
@@ -35,7 +39,7 @@ export async function   matchAllJobOffersForUser(userId: string){
             where: {
                 jobOfferId_userId: {
                     jobOfferId: jobOffer.id,
-                    userId: Number(userId)
+                    userId: userId
                 }
             },
             update: {
@@ -52,7 +56,7 @@ export async function   matchAllJobOffersForUser(userId: string){
     return jobOffers;
 }
 
-export async function getMatch(userId: string, jobOfferId: string){
+export async function getMatch(userId: string, jobOfferId: string) {
     const result = await prisma.match.findUnique({
         where: {
             jobOfferId_userId: {

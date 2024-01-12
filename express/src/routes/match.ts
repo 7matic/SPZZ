@@ -1,12 +1,17 @@
 import express from 'express';
-import prisma from '../../lib/db';
 import { getMatch, matchAllJobOffersForUser } from '../controllers/match';
+import { verifyAccessToken } from '../../lib/jwt';
+import { IGetUserAuthInfoRequest } from '../../lib/types';
 
 const matchRouter = express.Router();
 
-matchRouter.post(`/match`, async (req, res) => {
-    const { userId } = req.body;
-    await matchAllJobOffersForUser(userId);
+matchRouter.get(`/match`, verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
+    const jobOffers = await matchAllJobOffersForUser(Number(req.user?.id));
+
+    if(!jobOffers){
+        return res.json({error: "User skills not found! Please upload CV!"})
+    }
+
     return res.json({"message": "Matched user to all current job offers!"});
 });
 
