@@ -1,12 +1,14 @@
 import express from "express";
 import { getConversation, getConversations, sendMessage } from "../controllers/messages";
+import { verifyAccessToken } from "../../lib/jwt";
+import { IGetUserAuthInfoRequest } from "../../lib/types";
 
 const messageRouter = express.Router();
 
-messageRouter.post(`/`, async (req, res) => {
-    const { sentFrom, sentTo, content } = req.body;
+messageRouter.post(`/send`, verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
+    const { sentTo, content } = req.body;
 
-    const user = await sendMessage(sentFrom, sentTo, content);
+    const user = await sendMessage(req.user?.id!, sentTo, content);
 
     if(user != null)
         res.json(user)
@@ -14,10 +16,10 @@ messageRouter.post(`/`, async (req, res) => {
         res.json({ error: "Message not sent!" })
 });
 
-messageRouter.get('/conversation', async (req, res) => {
-    const { user1, user2 } = req.query;
+messageRouter.get('/conversation', verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
+    const {  user2 } = req.query;
 
-    const messages = await getConversation(Number(user1), Number(user2));
+    const messages = await getConversation(req.user?.id!, Number(user2));
 
     if(messages != null)
         res.json(messages)
@@ -25,10 +27,9 @@ messageRouter.get('/conversation', async (req, res) => {
         res.json({ error: "Conversation not found!" })
 });
 
-messageRouter.get('/conversations', async (req, res) => {
-    const { userId } = req.query;
+messageRouter.get('/conversations', verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
 
-    const messages = await getConversations(Number(userId));
+    const messages = await getConversations(req.user?.id!);
 
     if(messages != null)
         res.json(messages)

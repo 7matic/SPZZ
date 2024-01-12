@@ -18,9 +18,11 @@ export async function getSortedJobsWithMatches(
     include: {
       position: {
         select: {
+          title: true,
           company: {
             select: {
               name: true,
+              logo: true,
             },
           },
         },
@@ -38,6 +40,25 @@ export async function getSortedJobsWithMatches(
   });
 
   return jobs;
+}
+
+export async function deleteJob(id: string, companyId: number) {
+  let job;
+
+  try {
+    job = await prisma.jobOffer.delete({
+      where: {
+        id: Number(id),
+        companyId: companyId,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError && e.code === "P2025") {
+      return null;
+    }
+  }
+
+  return job;
 }
 
 export async function applyToJob(
@@ -74,30 +95,4 @@ export async function applyToJob(
     }
   }
   return result;
-}
-
-export async function getJobApplicants(jobId: string) {
-  const applicants = await prisma.jobOffer.findUnique({
-    where: {
-      id: Number(jobId),
-    },
-    select: {
-      applicants: {
-        select: {
-            firstName: true,
-            lastName: true,
-            matches: {
-                where: {
-                    jobOfferId: Number(jobId),
-                },
-                select: {
-                    score: true,
-                }
-            }
-        }
-      }
-    },
-  });
-  
-  return applicants;
 }

@@ -3,17 +3,34 @@ import prisma from "../../lib/db";
 import { matchAllJobOffersForUser } from "../controllers/match";
 import {
   applyToJob,
-  getJobApplicants,
+  deleteJob,
   getSortedJobsWithMatches,
 } from "../controllers/jobs";
+import { verifyAccessToken } from "../../lib/jwt";
+import { IGetUserAuthInfoRequest } from "../../lib/types";
 
 const jobsRouter = express.Router();
 
-jobsRouter.get("/", async (req, res) => {
-  const { user_id, sort, sort_mode, page } = req.query;
+jobsRouter.get('/get', async (req, res) => {
+  const { id } = req.query;
 
-  if(sort_mode == 'job_match')
-    await matchAllJobOffersForUser(String(user_id));
+  const joboffer = await prisma.jobOffer.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (joboffer != null) res.json(joboffer);
+  else res.json({ error: "Job not found!" });
+});
+
+jobsRouter.get("/all", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
+  const { sort, sort_mode, page } = req.query;
+
+  const user_id = req.user?.id;
+
+  if (sort_mode == 'job_match')
+    await matchAllJobOffersForUser(user_id!);
 
   const jobs = await getSortedJobsWithMatches(
     String(user_id),
@@ -26,10 +43,10 @@ jobsRouter.get("/", async (req, res) => {
   else res.json({ error: "Jobs not found!" });
 });
 
-jobsRouter.post("/", async (req, res) => {
+jobsRouter.post("/create", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
   const joboffer = await prisma.jobOffer.create({
     data: {
-      companyId: Number(req.body.companyId),
+      companyId: req.user?.company_id!,
       positionId: Number(req.body.positionId),
       salary: Number(req.body.salary),
       active: Boolean(req.body.active),
@@ -41,91 +58,46 @@ jobsRouter.post("/", async (req, res) => {
   else res.json({ error: "Job not found!" });
 });
 
-jobsRouter.put("/", async (req, res) => {
-  const jobId = req.query.id;
-
-  const joboffer = await prisma.jobOffer.update({
+jobsRouter.put("/update", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
+  const updatedOffer = await prisma.jobOffer.update({
     where: {
-      id: Number(jobId),
+      id: Number(req.body.id),
+      companyId: req.user?.company_id
     },
     data: {
-      companyId: Number(req.body.companyId),
-      positionId: Number(req.body.positionId),
       salary: Number(req.body.salary),
       active: Boolean(req.body.active),
       location: String(req.body.location),
     },
   });
 
-  if (joboffer != null) res.json(joboffer);
-  else res.json({ error: "Job not found!" });
+  if (updatedOffer) return res.json(updatedOffer);
+
+  return res.status(400).json({ error: "Job not found!" })
 });
 
-jobsRouter.delete("/", async (req, res) => {
+jobsRouter.delete("/delete", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
   const jobId = req.query.id;
 
-  const joboffer = await prisma.jobOffer.delete({
-    where: {
-      id: Number(jobId),
-    },
-  });
+  const joboffer = await deleteJob(String(jobId), req.user?.company_id!);
 
   if (joboffer != null) res.json(joboffer);
   else res.json({ error: "Job not found!" });
 });
 
-jobsRouter.post("/apply_job", async (req, res) => {
+jobsRouter.post("/apply_job", verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
   const job_id = req.query.id;
 
-  const { user_id, applied } = req.body;
+  const { applied } = req.body;
 
   const result = await applyToJob(
     String(job_id),
-    String(user_id),
+    String(req.user?.id),
     Boolean(applied)
   );
 
   if (result != null) res.json("Job updated!");
   else res.status(500).json({ error: "Job not found!" });
-});
-
-jobsRouter.get("/apply_job", async (req, res) => {
-  const jobId = req.query.id;
-
-  const applicants = await getJobApplicants(String(jobId));
-
-  if (applicants != null) res.json(applicants);
-  else res.json({ error: "Applicants not found!" });
-});
-
-jobsRouter.post("/choose-applicants", async (req, res) => {
-  const jobId = req.query.id;
-
-  const { user_id } = req.body;
-
-  const response = await prisma.jobOffer.update({
-    where: {
-      id: Number(jobId),
-    },
-    data: {
-      active: false,
-      position: {
-        update: {
-          heldBy: {
-            connect: {
-              id: Number(user_id),
-            }
-          },
-          isFilled: true,
-          startDate: new Date(),
-          endDate: undefined
-        }
-      },
-    },
-  });
-
-  if (response != null) res.json("Job updated!");
-  else res.json({ error: "Job not found!" });
 });
 
 export { jobsRouter };
