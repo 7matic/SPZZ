@@ -30,8 +30,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-console.log(process.env.JWT_SECRET);
-
 app.use(express.json());
 app.use('/user', userRouter);
 app.use(uploadRouter);
