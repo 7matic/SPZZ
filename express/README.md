@@ -15,7 +15,7 @@ JWT_SECRET=5a1fe99383364f1b75ff3dc7eec51766a6da4be312fa0c7416945deca787bed7
 You can copy this into the .env file and the application will work fine as long as you set the same MYSQL_ROOT_PASSWORD in the .env file of the root project folder.
 
 ## Seeding the database
-In order to seed the database you can simply use ```npm run reset``` from the root of the express folder. The Docker stack must be running in order for this to work. Note that this will drop your current database, create a new one and seed it with the /prisma/seed.ts script.
+In order to seed the database you can simply use ```npm run reset``` from the root of the express folder. The Docker stack must be running in order for this to work. Note that this will drop your current database, create a new one and seed it with the /prisma/seed.ts script. **I suggest you do this every time you pull to prevent unnecessary debugging of errors.**
 
 ## Setting up the API in Postman
 Please first call the login route so you get the JWT token to use with future requests. You can then set the token as a variable in the Environments tab. I named it authorizationSPZZ. You can now use it all over your app. The expiration time is set to 2hrs for development purposes. After that you need to log in again and repet the process. Using the User/WithToken will show you what payload the token holds and verify that you set it correctly.
