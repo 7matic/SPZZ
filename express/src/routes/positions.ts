@@ -1,5 +1,7 @@
 import express from "express";
 import { createPosition, deletePosition, getPosition, updatePosition } from "../controllers/positions";
+import { verifyAccessToken } from "../../lib/jwt";
+import { IGetUserAuthInfoRequest } from "../../lib/types";
 
 const positionRouter = express.Router();
 
@@ -11,26 +13,38 @@ positionRouter.get(`/`, async (req, res) => {
     res.json(positions);
 });
 
-positionRouter.post(`/`, async (req, res) => {
+positionRouter.post(`/create`, verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
     const { body } = req;
 
-    const position = await createPosition(body);
+    const position = await createPosition(body, req.user?.company_id!);
+
+    if(!position){
+        return res.status(400).json({ error: "Position not created!" });
+    }
 
     res.json(position);
 });
 
-positionRouter.delete(`/`, async (req, res) => {
+positionRouter.delete(`/delete`, verifyAccessToken , async (req : IGetUserAuthInfoRequest, res) => {
     const { id } = req.query;
 
-    const position = await deletePosition(String(id));
+    const position = await deletePosition(String(id), req.user?.company_id!);
     
+    if(!position){
+        return res.status(400).json({ error: "Position not deleted!" });
+    }
+
     res.json(position);
 });
 
-positionRouter.put(`/`, async (req, res) => {
+positionRouter.put(`/update`, verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
     const { body } = req;
 
-    const position = await updatePosition(body);
+    const position = await updatePosition(body, req.user?.company_id!);
+
+    if(!position){
+        return res.status(400).json({ error: "Position not updated!" });
+    }
 
     res.json(position);
 });
