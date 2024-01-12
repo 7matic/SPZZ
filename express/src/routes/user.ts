@@ -1,6 +1,7 @@
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import prisma from '../../lib/db';
-// import { checkJwt } from '..';
+import { verifyAccessToken } from '../../lib/jwt';
+import { IGetUserAuthInfoRequest } from '../../lib/types';
 
 const userRouter = express.Router();
 
@@ -19,7 +20,7 @@ userRouter.post(`/user`, async (req, res) => {
     else if (token) {
         result = await prisma.user.findUnique({
             where: {
-                auth0token: String(token)
+                email: String(token)
             }
         })
     }
@@ -36,6 +37,14 @@ userRouter.get(`/`, async (req, res) => {
     const result = await prisma.user.findUnique({
         where: {
             id: Number(id),
+        },
+        include:{
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            }
         }
     })
 
@@ -43,6 +52,10 @@ userRouter.get(`/`, async (req, res) => {
         res.json(result)
     else
         res.json({ error: "User not found!" })
+});
+
+userRouter.get('/withToken', verifyAccessToken as RequestHandler, async (req : IGetUserAuthInfoRequest, res) => {
+    res.json(req.user);
 });
 
 export { userRouter };
