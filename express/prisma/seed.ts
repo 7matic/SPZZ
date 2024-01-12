@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../lib/auth";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ["query", "info", "warn"],
+});
 
 async function main() {
   const user1 = await prisma.user.create({
@@ -121,6 +123,7 @@ async function main() {
       }
     },
   });
+
   const company2 = await prisma.company.create({
     data: {
       name: "Microsoft",
