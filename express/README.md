@@ -1,4 +1,21 @@
-## Setting up the enviromental variables
+## TLDR
+**Set the environmental variables LOCALHOST_DATABASE_URL, DATABASE_URL AND JWT_SECRET**
+
+```
+DATABASE_URL=mysql://root:password@mysql:3306/spzz
+LOCALHOST_DATABASE_URL=mysql://root:password@localhost:3306/spzz
+JWT_SECRET=5a1fe99383364f1b75ff3dc7eec51766a6da4be312fa0c7416945deca787bed7
+```
+
+```
+docker compose up -d
+cd express
+npm run reset
+```
+
+The database should now be seeded!
+
+## Setting up the environmental variables
 
 This application runs automatically when running
 ```docker compose up``` in the root directory of the project.
