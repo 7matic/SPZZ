@@ -16,7 +16,7 @@ enum Role {
 
 model User {
   id          Int     @id @default(autoincrement())
-  auth0token  String? @unique
+  hash        String
   pdfFileName String?
 
   email          String  @unique

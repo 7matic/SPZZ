@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "../lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -243,7 +244,7 @@ async function main() {
   const user1 = await prisma.user.create({
     data: {
       email: "john.doe@gmail.com",
-      auth0token: "111",
+      hash: await hashPassword("password"), 
       companyId: company1.id,
       firstName: "John",
       lastName: "Doe",
@@ -254,7 +255,7 @@ async function main() {
   const user2 = await prisma.user.create({
     data: {
       email: "jane.smith@yahoo.com",
-      auth0token: "222",
+      hash: await hashPassword("password"),
       firstName: "Jane",
       lastName: "Smith",
       phoneNumber: "555-5678",
@@ -264,7 +265,7 @@ async function main() {
   const user3 = await prisma.user.create({
     data: {
       email: "mike.jones@hotmail.com",
-      auth0token: "333",
+      hash: await hashPassword("krneki"),
       firstName: "Mike",
       lastName: "Jones",
       phoneNumber: "555-9876",
@@ -274,7 +275,7 @@ async function main() {
   const user4 = await prisma.user.create({
     data: {
       email: "lisa.white@gmail.com",
-      auth0token: "444",
+      hash: await hashPassword("password12"),
       firstName: "Lisa",
       lastName: "White",
       phoneNumber: "555-4321",
@@ -284,7 +285,7 @@ async function main() {
   const user5 = await prisma.user.create({
     data: {
       email: "alex.brown@yahoo.com",
-      auth0token: "555",
+      hash: await hashPassword("password123"),
       firstName: "Alex",
       lastName: "Brown",
       phoneNumber: "555-8765",
