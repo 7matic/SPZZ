@@ -7,7 +7,7 @@ export function generateAccessToken(user_id: number, role: string, company_id?: 
         id: user_id,
         role: role,
         company_id: company_id
-    }, process.env.JWT_SECRET as string, { expiresIn: '15m' });
+    }, process.env.JWT_SECRET as string, { expiresIn: '120m' });
 }
 
 // TODO: Non blocking middleware
