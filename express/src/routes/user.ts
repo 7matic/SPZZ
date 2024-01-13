@@ -38,7 +38,7 @@ userRouter.get(`/`, async (req, res) => {
         where: {
             id: Number(id),
         },
-        include:{
+        include: {
             company: {
                 select: {
                     id: true,
@@ -54,7 +54,34 @@ userRouter.get(`/`, async (req, res) => {
         res.json({ error: "User not found!" })
 });
 
-userRouter.get('/withToken', verifyAccessToken as RequestHandler, async (req : IGetUserAuthInfoRequest, res) => {
+userRouter.put(`/update`, verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
+    const { body } = req;
+
+    const result = await prisma.user.update({
+        where: {
+            id: req.user?.id,
+        },
+        data: {
+            firstName: body.firstName,
+            lastName: body.lastName,
+            email: body.email,
+            phoneNumber: body.phoneNumber,
+            location: body.location,
+            designations: body.designations,
+            colleges: body.colleges,
+            degrees: body.degrees,
+            workExperience: body.workExperience,
+            skills: body.skills,
+        }
+    });
+
+    if (result != null)
+        res.json(result)
+    else
+        res.json({ error: "Update failed!" });
+});
+
+userRouter.get('/withToken', verifyAccessToken as RequestHandler, async (req: IGetUserAuthInfoRequest, res) => {
     res.json(req.user);
 });
 
