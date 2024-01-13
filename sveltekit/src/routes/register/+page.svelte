@@ -12,7 +12,7 @@
     }
 
     async function handleRegister() {
-        const response = await fetch(`${BACKEND_URL}/auth/login`, {
+        const response = await fetch(`${BACKEND_URL}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -24,8 +24,8 @@
         });
 
         if (!response.ok) {
-            errorMessage = 'Prijava ni uspela. Poskusite ponovno.';
-            console.error('Login failed');
+            errorMessage = 'Registracija ni uspela. Poskusite ponovno.';
+            console.error('Registration failed');
             return;
         }
 
@@ -37,7 +37,7 @@
 
 <div class="flex flex-grow items-center justify-center min-h-100 bg-gray-200 font-sans">
     <div class="p-16 bg-white rounded shadow-2xl w-full max-w-md mx-auto">
-        <h2 class="mb-10 text-3xl font-bold text-gray-800">Prijavite se</h2>
+        <h2 class="mb-10 text-3xl font-bold text-gray-800">Registrirajte se</h2>
         <div class="space-y-5">
             <div>
                 <label class="block mb-1 font-bold text-gray-500">E-poštni naslov</label>
@@ -53,11 +53,12 @@
             </div>
             <button on:click={handleRegister} disabled={isDisabled}
                     class="{isDisabled ? 'bg-gray-500' : 'bg-primary'} transform transition-background duration-200 block w-full hover:bg-light p-4 rounded text-white font-bold">
-                Prijava
+                Registracija
             </button>
-            <a href="/register"
-               class="transform transition-background duration-200 block w-full text-center text-primary hover:text-light">Še
-                nimate računa? Registrirajte se</a>
+            <a href="/login"
+               class="transform transition-background duration-200 block w-full text-center text-primary hover:text-light">Že
+                imate račun?
+                Prijavite se</a>
             {#if errorMessage}
                 <div class="bg-red-500 text-white p-3 rounded">{errorMessage}</div>
             {/if}
