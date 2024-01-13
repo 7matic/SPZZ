@@ -5,7 +5,7 @@
     let isDisabled: boolean = true;
 
     let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
-    $: isDisabled = !username || !password || !validateEmail(username);
+    $: isDisabled = !username || !password || !validateEmail(username) || password.length < 8;
 
     function validateEmail(email: string) {
         return /\S+@\S+\.\S+/.test(email);
@@ -30,8 +30,23 @@
         }
 
         const data = await response.json();
-        console.log(data);
+        const token = await fetch(`${BACKEND_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: username,
+                password: password
+            })
+        });
+        const tokenData = await token.json();
+        console.log(tokenData);
+        localStorage.setItem('token', tokenData['accessToken']);
         errorMessage = '';
+
+        window.location.href = '/onboarding?step=1';
+
     }
 </script>
 
@@ -46,7 +61,7 @@
                        placeholder="E-poštni naslov">
             </div>
             <div>
-                <label class="block mb-1 font-bold text-gray-500">Geslo</label>
+                <label class="block mb-1 font-bold text-gray-500">Geslo (vsaj 8 znakov)</label>
                 <input type="password" bind:value={password} minlength="8"
                        class="w-full border-2 border-gray-200 p-3 rounded outline-none focus:border-primary text-gray-800"
                        placeholder="Geslo">
