@@ -172,8 +172,6 @@ async function main() {
       companyId: company1.id,
       requirements:
         "Strong proficiency in Java and experience with Spring framework.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position2 = await prisma.position.create({
@@ -183,8 +181,6 @@ async function main() {
       companyId: company1.id,
       requirements:
         "Proven experience in product management and leadership skills.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position3 = await prisma.position.create({
@@ -194,8 +190,6 @@ async function main() {
       companyId: company2.id,
       requirements:
         "Expertise in cloud platforms such as AWS, Azure, or Google Cloud.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position4 = await prisma.position.create({
@@ -205,8 +199,6 @@ async function main() {
       companyId: company2.id,
       requirements:
         "Proficient in HTML, CSS, and JavaScript; experience with modern frameworks like React or Vue.js.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position5 = await prisma.position.create({
@@ -216,8 +208,6 @@ async function main() {
       companyId: company3.id,
       requirements:
         "Experience in Swift programming and familiarity with iOS development tools.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position6 = await prisma.position.create({
@@ -227,8 +217,6 @@ async function main() {
       companyId: company3.id,
       requirements:
         "Strong analytical skills, proficiency in Python, and experience with machine learning algorithms.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position7 = await prisma.position.create({
@@ -237,8 +225,6 @@ async function main() {
       description: "Implement and manage infrastructure as code.",
       companyId: company4.id,
       requirements: "Experience with Docker, Kubernetes, and CI/CD pipelines.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position8 = await prisma.position.create({
@@ -248,8 +234,6 @@ async function main() {
       companyId: company4.id,
       requirements:
         "Portfolio showcasing previous UI/UX design projects; proficiency in design tools like Figma or Sketch.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position9 = await prisma.position.create({
@@ -259,8 +243,6 @@ async function main() {
       companyId: company5.id,
       requirements:
         "Knowledge of cybersecurity principles, experience with security assessment tools.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
   const position10 = await prisma.position.create({
@@ -270,8 +252,6 @@ async function main() {
       companyId: company5.id,
       requirements:
         "Proven experience in marketing, strong communication and analytical skills.",
-      startDate: new Date("2023-01-01"),
-      endDate: new Date("2023-12-31"),
     },
   });
 
@@ -282,6 +262,8 @@ async function main() {
       location: "Cupertino, CA",
       salary: 105000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer2 = await prisma.jobOffer.create({
@@ -291,6 +273,8 @@ async function main() {
       location: "Redmond, WA",
       salary: 92000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer3 = await prisma.jobOffer.create({
@@ -300,6 +284,8 @@ async function main() {
       location: "Mountain View, CA",
       salary: 115000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer4 = await prisma.jobOffer.create({
@@ -309,6 +295,8 @@ async function main() {
       location: "Cupertino, CA",
       salary: 98000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer5 = await prisma.jobOffer.create({
@@ -318,6 +306,8 @@ async function main() {
       location: "Redmond, WA",
       salary: 91000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer6 = await prisma.jobOffer.create({
@@ -327,6 +317,8 @@ async function main() {
       location: "Mountain View, CA",
       salary: 120000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer7 = await prisma.jobOffer.create({
@@ -336,6 +328,8 @@ async function main() {
       location: "Cupertino, CA",
       salary: 102000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer8 = await prisma.jobOffer.create({
@@ -345,6 +339,8 @@ async function main() {
       location: "Redmond, WA",
       salary: 93000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer9 = await prisma.jobOffer.create({
@@ -354,6 +350,8 @@ async function main() {
       location: "Mountain View, CA",
       salary: 110000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
   const jobOffer10 = await prisma.jobOffer.create({
@@ -363,6 +361,8 @@ async function main() {
       location: "Cupertino, CA",
       salary: 95000,
       active: true,
+      startDate: new Date("2023-01-01"),
+      endDate: new Date("2023-12-31"),
     },
   });
 

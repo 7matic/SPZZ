@@ -48,8 +48,6 @@ model Position {
   title        String
   description  String
   requirements String    @db.LongText
-  startDate    DateTime
-  endDate      DateTime
   jobOffer     JobOffer?
   company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId    Int
@@ -85,6 +83,8 @@ model JobOffer {
   position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
   postedAt   DateTime @default(now())
   positionId Int      @unique
+  startDate  DateTime
+  endDate    DateTime
   location   String
   companyId  Int
   salary     Int
