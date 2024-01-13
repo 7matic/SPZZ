@@ -16,11 +16,16 @@ const config = {
 		)
 	],
 	theme: {
-		extend: {},
+		extend: {
+			colors: {
+				primary: '#3887be',
+				background: '#122f43'
+			}
+		},
 	},
 	plugins: [
 		skeleton({
-			themes: { preset: [ "crimson" ] }
+			themes: { preset: [ "modern" ] }
 		})
 	]
 } satisfies Config;
