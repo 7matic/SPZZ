@@ -5,14 +5,16 @@
     export let y;
 
     export let tabs = [
-        {name: "Prijava", link: "#projects"},
+        {name: "Prijava", link: "/login"},
     ];
 </script>
 
 <header
         class={"sticky z-[10] top-0 duration-200 px-6 flex flex-col gap-2 items-center justify-between border-b border-solid py-4 bg-dark border-gray-800 shadow-outline-primary"}
 >
-    <Logo size="64"/>
+    <a href="/">
+        <Logo size="64"/>
+    </a>
     <div class="sm:flex items-center gap-4 hidden font-sans">
         {#each tabs as tab, index}
             <a
