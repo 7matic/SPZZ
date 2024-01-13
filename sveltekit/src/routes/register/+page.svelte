@@ -45,7 +45,7 @@
         localStorage.setItem('token', tokenData['accessToken']);
         errorMessage = '';
 
-        window.location.href = '/onboarding?step=1';
+        window.location.href = '/onboarding';
 
     }
 </script>
