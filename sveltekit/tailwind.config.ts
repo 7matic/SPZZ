@@ -21,6 +21,7 @@ const config = {
                 primary: '#3887be',
                 background: '#122f43',
                 dark: '#0b1c28',
+                light: '#4FB7FF',
             },
             boxShadow: {
                 'outline-primary': '0px 14px 55px rgba(56, 135, 190, 0.45)',
