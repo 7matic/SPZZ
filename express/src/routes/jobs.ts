@@ -46,6 +46,8 @@ jobsRouter.get("/all", verifyAccessToken, async (req: IGetUserAuthInfoRequest, r
 jobsRouter.post("/create", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
   const joboffer = await prisma.jobOffer.create({
     data: {
+      startDate: new Date(),
+      endDate: new Date(),
       companyId: req.user?.company_id!,
       positionId: Number(req.body.positionId),
       salary: Number(req.body.salary),

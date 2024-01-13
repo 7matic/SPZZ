@@ -1,0 +1,66 @@
+<script lang="ts">
+    let username: string = '';
+    let password: string = '';
+    let errorMessage: string = '';
+    let isDisabled: boolean = true;
+
+    let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
+    $: isDisabled = !username || !password || !validateEmail(username);
+
+    function validateEmail(email: string) {
+        return /\S+@\S+\.\S+/.test(email);
+    }
+
+    async function handleRegister() {
+        const response = await fetch(`${BACKEND_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: username,
+                password: password
+            })
+        });
+
+        if (!response.ok) {
+            errorMessage = 'Prijava ni uspela. Poskusite ponovno.';
+            console.error('Login failed');
+            return;
+        }
+
+        const data = await response.json();
+        console.log(data);
+        errorMessage = '';
+    }
+</script>
+
+<div class="flex flex-grow items-center justify-center min-h-100 bg-gray-200 font-sans">
+    <div class="p-16 bg-white rounded shadow-2xl w-full max-w-md mx-auto">
+        <h2 class="mb-10 text-3xl font-bold text-gray-800">Prijavite se</h2>
+        <div class="space-y-5">
+            <div>
+                <label class="block mb-1 font-bold text-gray-500">E-poštni naslov</label>
+                <input type="email" bind:value={username}
+                       class="w-full border-2 border-gray-200 p-3 rounded outline-none focus:border-primary text-gray-800"
+                       placeholder="E-poštni naslov">
+            </div>
+            <div>
+                <label class="block mb-1 font-bold text-gray-500">Geslo</label>
+                <input type="password" bind:value={password} minlength="8"
+                       class="w-full border-2 border-gray-200 p-3 rounded outline-none focus:border-primary text-gray-800"
+                       placeholder="Geslo">
+            </div>
+            <button on:click={handleRegister} disabled={isDisabled}
+                    class="{isDisabled ? 'bg-gray-500' : 'bg-primary'} transform transition-background duration-200 block w-full hover:bg-light p-4 rounded text-white font-bold">
+                Prijava
+            </button>
+            <a href="/register"
+               class="transform transition-background duration-200 block w-full text-center text-primary hover:text-light">Še
+                nimate računa? Registrirajte se</a>
+            {#if errorMessage}
+                <div class="bg-red-500 text-white p-3 rounded">{errorMessage}</div>
+            {/if}
+        </div>
+    </div>
+</div>
