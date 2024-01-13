@@ -38,11 +38,23 @@ userRouter.get(`/`, async (req, res) => {
         where: {
             id: Number(id),
         },
-        include: {
+        select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phoneNumber: true,
+            location: true,
+            designations: true,
+            colleges: true,
+            degrees: true,
+            workExperience: true,
+            skills: true,
             company: {
                 select: {
-                    id: true,
                     name: true,
+                    logo: true,
+                    location: true,
+
                 }
             }
         }
