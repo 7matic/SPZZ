@@ -5,12 +5,12 @@
     export let y;
 
     export let tabs = [
-        {name: "Prijavi se", link: "#projects"},
+        {name: "Prijava", link: "#projects"},
     ];
 </script>
 
 <header
-        class={"sticky z-[10] top-0 duration-200 px-6 flex flex-col items-center justify-between border-b border-solid py-4 bg-dark border-gray-800 shadow-outline-primary"}
+        class={"sticky z-[10] top-0 duration-200 px-6 flex flex-col gap-2 items-center justify-between border-b border-solid py-4 bg-dark border-gray-800 shadow-outline-primary"}
 >
     <Logo size="64"/>
     <div class="sm:flex items-center gap-4 hidden font-sans">
@@ -23,7 +23,7 @@
                 <p>{tab.name}</p>
             </a>
         {/each}
-        <Button text="Preglej oglase"
+        <Button text="Pregled oglasov"
                 variation="primary"
         />
     </div>
