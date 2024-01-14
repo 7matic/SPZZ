@@ -107,7 +107,12 @@ export async function getConversation(sentFrom: number, sentTo: number) {
                     email: true,
                     company: true
                 }
-            }
+            },
+            content: true,
+            createdAt: true
+        },
+        orderBy: {
+            createdAt: 'asc'
         }
     });
 
