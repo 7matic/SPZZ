@@ -1,6 +1,7 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import {getUser, makeRequest} from "../../api/api";
+    import Button from "../../components/Button.svelte";
 
     let selectedJobOffer: any = null;
     let user: any;
@@ -53,7 +54,7 @@
     }
 
     function getApplyButtonStyle(jobOffer) {
-        return appliedJobs.has(jobOffer.id) ? "bg-red-500" : "bg-green-500";
+        return appliedJobs.has(jobOffer.id) ? "red" : "green";
     }
 
     function getApplyButtonText(jobOffer) {
@@ -66,7 +67,6 @@
 
     async function applyNow() {
         const jobId = selectedJobOffer.id;
-
         try {
             const isWithdrawal = appliedJobs.has(jobId);
             const response = makeRequest(
@@ -199,14 +199,14 @@
                             {selectedJobOffer.position.requirements}
                         </p>
                     </div>
-                    <button
-                            class="{getApplyButtonStyle(
-                selectedJobOffer
-              )} rounded-sm hover:bg-background transition text-white px-4 py-2 mt-2"
-                            on:click={applyNow}
-                    >
+                    <Button
+                            variation="{getApplyButtonStyle(selectedJobOffer)}"
+                            on:click={applyNow}>
                         {getApplyButtonText(selectedJobOffer)}
-                    </button>
+                    </Button>
+                    <Button>
+                        Komunicirajte s podjetjem
+                    </Button>
                 </div>
             {/if}
         </div>
