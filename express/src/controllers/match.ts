@@ -68,3 +68,53 @@ export async function getMatch(userId: string, jobOfferId: string) {
 
     return result;
 }
+
+export async function calculateMatchesForJob(jobOfferId: string) {
+    const users = await prisma.user.findMany({});
+
+    const jobOffer = await prisma.jobOffer.findUnique({
+        where: {
+            id: Number(jobOfferId)
+        },
+        include: {
+            position: true,
+        }
+    });
+
+    for (const user of users) {
+
+        const match_percentage = await fetch('http://py-algorithms:5000/job_match', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "job_description": jobOffer!.position.requirements,
+                "user_data": user?.skills
+            })
+        });
+
+        const match_percentage_json = await match_percentage.json() as PyResponse;
+
+        console.log(match_percentage_json);
+
+        const match = await prisma.match.upsert({
+            where: {
+                jobOfferId_userId: {
+                    jobOfferId: Number(jobOfferId),
+                    userId: user.id
+                }
+            },
+            update: {
+                score: match_percentage_json.match_percentage
+            },
+            create: {
+                jobOfferId: Number(jobOfferId),
+                userId: user.id,
+                score: match_percentage_json.match_percentage,
+            },
+        });
+    }
+
+    return jobOffer;
+}
