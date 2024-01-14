@@ -1,12 +1,9 @@
 <script lang="ts">
     import UploadCV from "../../components/UploadCV.svelte";
+    import CreateCompanyUser from "../../components/CreateCompanyUser.svelte";
 
     let step: number = 1;
     let userType: 'user' | 'company' = 'user';
-
-    let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
-    let errorMessage: string | null = null;
-    let isLoading: boolean = false;
 
     function setUserType(type: 'user' | 'company') {
         userType = type;
@@ -28,6 +25,10 @@
                     class="w-full py-2 mb-4 bg-primary text-gray-200 rounded hover:bg-light transform transition-background duration-200 font-sans text-lg">
                 <i class="fas fa-user mr-2"></i> Sem iskalec zaposlitve (delojemalec)
             </button>
+        </div>
+    {:else if step === 2 && userType === 'company'}
+        <div class="p-16 min-w-[60%] bg-white rounded shadow-lg w-64">
+            <CreateCompanyUser/>
         </div>
     {:else if step === 2 && userType === 'user'}
         <div class="p-16 min-w-[60%] bg-white rounded shadow-lg w-64">

@@ -1,5 +1,6 @@
 <script lang="ts">
     import Button from "./Button.svelte";
+    import {makeRequest} from "../api/api";
 
     let file: File | null = null;
     let fileInput: HTMLInputElement;
@@ -38,6 +39,7 @@
                 }
                 window.location.href = '/profile';
                 errorMessage = null;
+                await makeRequest('/match', 'GET');
             } catch (error) {
                 errorMessage = error.message;
             } finally {
@@ -50,9 +52,10 @@
 <div>
     <h2 class="mb-4 text-2xl font-bold text-gray-700">Naložite svoj CV</h2>
     <form
-            on:submit={handleSubmit}
+            on:submit={handleSubmit} class="color-primary"
     >
-        <input type="file" name="file" bind:this={fileInput} on:change={handleFileChange} required/>
+        <input type="file" name="file" bind:this={fileInput} on:change={handleFileChange} required class="text-primary"
+        />
         <Button type="submit"
         >
             Naložite

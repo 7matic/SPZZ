@@ -1,6 +1,7 @@
 <script>
     import Step from "./Step.svelte";
     import Button from "./Button.svelte";
+    import {isAuthenticated} from "../store/authStore";
 
     let steps = [
         {
@@ -23,24 +24,12 @@
         },
     ];
 
-    let benefits = [
-        {
-            metric: "10x",
-            name: "-_-",
-            description:
-                "blablablaaaa",
-        },
-        {
-            name: "-_-",
-            description:
-                "blablabla",
-        },
-        {
-            name: "-_-",
-            description:
-                "blablabla",
-        },
-    ];
+    let registerLink = '/register';
+    $: if ($isAuthenticated) {
+        registerLink = '/ads';
+    } else {
+        registerLink = '/register';
+    }
 </script>
 
 <main class="flex flex-col flex-1 p-4">
@@ -55,12 +44,14 @@
                 Naredite <span class="text-primary">nov korak</span> v vaši karieri.
                 <br/>
             </h2>
-            <Button
-                    text="Pridružite se SPZZ"
-                    variation="primary"
-                    className="mt-12 text-xl"
-                    icon="fas fa-chevron-right"
-            />
+            <a href={registerLink}>
+                <Button
+                        text="Pridružite se SPZZ"
+                        variation="primary"
+                        className="mt-12 text-xl"
+                        icon="fas fa-chevron-right"
+                />
+            </a>
         </div>
         <div class="relative shadow-2xl grid place-items-center">
             <img

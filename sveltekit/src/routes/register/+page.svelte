@@ -1,52 +1,40 @@
 <script lang="ts">
+    import {makeRequest, getUser} from "../../api/api";
+    import {isAuthenticated} from "../../store/authStore";
+
     let username: string = '';
     let password: string = '';
     let errorMessage: string = '';
     let isDisabled: boolean = true;
 
-    let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
     $: isDisabled = !username || !password || !validateEmail(username) || password.length < 8;
 
     function validateEmail(email: string) {
         return /\S+@\S+\.\S+/.test(email);
     }
 
+
     async function handleRegister() {
-        const response = await fetch(`${BACKEND_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: username,
-                password: password
-            })
-        });
-
-        if (!response.ok) {
+        try {
+            const reg = await makeRequest(`/auth/register`, 'POST', {
+                    email: username,
+                    password: password
+                }
+            );
+            const tokenData = await makeRequest(`/auth/login`, 'POST', {
+                    email: username,
+                    password: password
+                }
+            );
+            localStorage.setItem('token', tokenData['accessToken']);
+            errorMessage = '';
+            isAuthenticated.set(true);
+            const user = await getUser();
+            localStorage.setItem('user', JSON.stringify(user));
+            window.location.href = '/onboarding';
+        } catch (e) {
             errorMessage = 'Registracija ni uspela. Poskusite ponovno.';
-            console.error('Registration failed');
-            return;
         }
-
-        const data = await response.json();
-        const token = await fetch(`${BACKEND_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: username,
-                password: password
-            })
-        });
-        const tokenData = await token.json();
-        console.log(tokenData);
-        localStorage.setItem('token', tokenData['accessToken']);
-        errorMessage = '';
-
-        window.location.href = '/onboarding';
-
     }
 </script>
 

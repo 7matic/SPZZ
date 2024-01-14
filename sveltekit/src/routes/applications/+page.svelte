@@ -7,17 +7,23 @@
     let user: any;
     let data: any;
     let loading = true;
-    let userID: any;
     let appliedJobs: Set<string> = new Set();
     let sort = 'salary';
     let sort_mode = 'desc';
 
     async function loadJobs(sort: string = 'salary', sort_mode: string = 'desc') {
         try {
+            // Get user ID from local storage
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user.id;
             data = await makeRequest(`/jobs/all?sort=${sort}&sort_mode=${sort_mode}&page=0`, 'GET');
+            data = data.filter(job => {
+                // Check if the user ID is in the applicants array
+                return job.applicants.some(applicant => applicant.id === userId);
+            });
             data.forEach(jobOffer => {
                 const userHasApplied = jobOffer.applicants.some(
-                    (applicant) => applicant.id === userID
+                    (applicant) => applicant.id === userId
                 );
                 if (userHasApplied) {
                     appliedJobs.add(jobOffer.id);
@@ -67,6 +73,7 @@
 
     async function applyNow() {
         const jobId = selectedJobOffer.id;
+
         try {
             const isWithdrawal = appliedJobs.has(jobId);
             const response = makeRequest(
@@ -83,14 +90,14 @@
             }
             console.log(
                 ` ${
-                    isWithdrawal ? "Successfully withdrawn!" : "Successfully applied!"
+                    isWithdrawal ? "Uspešno preklicana prijava!" : "Uspešno prijavljeno!"
                 }`
             );
 
             await loadJobs();
             alert(
                 ` ${
-                    isWithdrawal ? "Successfully withdrawn!" : "Successfully applied!"
+                    isWithdrawal ? "Uspešno preklicana prijava!" : "Uspešno prijavljeno!"
                 }`
             );
             // Close the right side
@@ -116,7 +123,7 @@
 
             <div class="flex font-normal">
                 <div class="w-full p-4 h-[83vh] overflow-y-scroll">
-                    <h2 class="text-3xl font-semibold mb-4">Ponudbe dela</h2>
+                    <h2 class="text-3xl font-semibold mb-4">Moje prijave</h2>
                     <div class="flex justify-between items-center gap-4 ">
                         <select bind:value={sort} on:change={() => loadJobs(sort, sort_mode)}
                                 class="w-full py-2 px-3 rounded border border-gray-300 mb-4 bg-dark text-white">
@@ -212,4 +219,3 @@
         </div>
     </div>
 {/if}
-  
