@@ -5,7 +5,7 @@ WORKDIR /code
 COPY package-lock.json package.json ./
 
 RUN npm install
-
+VOLUME /code/node_modules
 COPY . .
 
 RUN npx prisma generate
