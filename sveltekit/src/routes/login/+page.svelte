@@ -34,12 +34,12 @@
         localStorage.setItem('token', tokenData['accessToken']);
         errorMessage = '';
 
-        window.location.href = '/onboarding';
+        window.location.href = '/profile';
 
     }
 </script>
 
-<div class="flex flex-grow items-center justify-center min-h-100 bg-gray-200 font-sans">
+<div class="flex flex-grow items-center justify-center min-h-100 font-sans">
     <div class="p-16 bg-white rounded shadow-2xl w-full max-w-md mx-auto">
         <h2 class="mb-10 text-3xl font-bold text-gray-800">Prijavite se</h2>
         <div class="space-y-5">

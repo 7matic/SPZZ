@@ -10,7 +10,7 @@
 </script>
 
 <header
-        class={"sticky z-[10] top-0 duration-200 px-6 flex flex-col gap-2 items-center justify-between border-b border-solid py-4 bg-dark border-gray-800 shadow-outline-primary"}
+        class={"sticky z-[10] top-0 duration-200 px-6 flex flex-col gap-2 items-center justify-between border-b border-solid py-4 bg-dark border-gray-800 "}
 >
     <a href="/">
         <Logo size="64"/>
