@@ -30,3 +30,15 @@ export async function makeRequest(route: string, method: Method, body?: any) {
     }
 }
 
+export async function getUser() {
+    if (typeof window !== 'undefined') {
+        try {
+            const response = await makeRequest(`/user/withToken`, 'GET');
+            const userId = response.id;
+            const userResponse = await makeRequest(`/user?id=${userId}`, 'GET');
+            return {...userResponse, id: userId};
+        } catch (e) {
+            console.log(e);
+        }
+    }
+}

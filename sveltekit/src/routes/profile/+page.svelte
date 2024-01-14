@@ -3,25 +3,12 @@
     import UploadCV from "../../components/UploadCV.svelte";
     import Button from "../../components/Button.svelte";
     import Card from "../../components/Card.svelte";
-    import {makeRequest} from "../../api/api";
+    import {makeRequest, getUser} from "../../api/api";
 
     let user: User;
     let loading = true;
     let infoMessage = '';
-
-    async function getUser() {
-        if (typeof window !== 'undefined') {
-            try {
-                const response = await makeRequest(`/user/withToken`, 'GET');
-                const userId = response.id;
-                const userResponse = await makeRequest(`/user?id=${userId}`, 'GET');
-                return userResponse;
-            } catch (e) {
-                console.log(e);
-            }
-        }
-    }
-
+    
     async function handleSubmit() {
         if (typeof window !== 'undefined') {
             try {

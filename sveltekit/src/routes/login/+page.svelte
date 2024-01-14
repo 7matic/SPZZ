@@ -1,6 +1,6 @@
 <script lang="ts">
     import {isAuthenticated} from "../../store/authStore";
-    import {makeRequest} from "../../api/api";
+    import {makeRequest, getUser} from "../../api/api";
 
     let username: string = '';
     let password: string = '';
@@ -11,19 +11,6 @@
 
     function validateEmail(email: string) {
         return /\S+@\S+\.\S+/.test(email);
-    }
-
-    async function getUser() {
-        if (typeof window !== 'undefined') {
-            try {
-                const response = await makeRequest(`/user/withToken`, 'GET');
-                const userId = response.id;
-                const userResponse = await makeRequest(`/user?id=${userId}`, 'GET');
-                return userResponse;
-            } catch (e) {
-                console.log(e);
-            }
-        }
     }
 
     async function handleLogin() {
