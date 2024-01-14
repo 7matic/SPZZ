@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {makeRequest} from "../../api/api";
+    import {makeRequest, getUser} from "../../api/api";
     import {isAuthenticated} from "../../store/authStore";
 
     let username: string = '';
@@ -13,18 +13,6 @@
         return /\S+@\S+\.\S+/.test(email);
     }
 
-    async function getUser() {
-        if (typeof window !== 'undefined') {
-            try {
-                const response = await makeRequest(`/user/withToken`, 'GET');
-                const userId = response.id;
-                const userResponse = await makeRequest(`/user?id=${userId}`, 'GET');
-                return userResponse;
-            } catch (e) {
-                console.log(e);
-            }
-        }
-    }
 
     async function handleRegister() {
         try {
@@ -38,7 +26,7 @@
             isAuthenticated.set(true);
             const user = await getUser();
             localStorage.setItem('user', JSON.stringify(user));
-            window.location.href = '/profile';
+            window.location.href = '/onboarding';
         } catch (e) {
             errorMessage = 'Registracija ni uspela. Poskusite ponovno.';
         }

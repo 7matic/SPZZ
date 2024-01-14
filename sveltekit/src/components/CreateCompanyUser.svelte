@@ -1,0 +1,51 @@
+<script lang="ts">
+    import Button from "./Button.svelte";
+    import {makeRequest} from "../api/api";
+
+    let name: string = '';
+    let logo: string = '';
+    let location: string = '';
+    let errorMessage: string | null = null;
+    let isLoading: boolean = false;
+
+    async function handleSubmit() {
+        isLoading = true;
+        errorMessage = null;
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user.id;
+
+        try {
+            await makeRequest('/company', 'POST', {
+                name,
+                logo,
+                location,
+                userId
+            });
+        } catch (error) {
+            errorMessage = error.message;
+        } finally {
+            isLoading = false;
+        }
+    }
+</script>
+
+<form on:submit|preventDefault={handleSubmit} class="flex gap-y-4 flex-col">
+    <h2 class="mb-4 text-2xl font-bold text-gray-700">Vpišite podatke o vašem podjetju</h2>
+    <label>
+        Ime podjetja:
+        <input type="text" bind:value={name} required class="bg-gray-200 border-2 border-gray-800 ml-2"/>
+    </label>
+    <label>
+        URL logotipa:
+        <input type="url" bind:value={logo} required class="bg-gray-200 border-2 border-gray-800 ml-2"/>
+    </label>
+    <label>
+        Lokacija:
+        <input type="text" bind:value={location} required class="bg-gray-200 border-2 border-gray-800 ml-2"/>
+    </label>
+    <Button type="submit" disabled={isLoading}>Ustvarite podjetje</Button>
+    {#if errorMessage}
+        <p class="mt-4 text-red-500">{errorMessage}</p>
+    {/if}
+</form>
