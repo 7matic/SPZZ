@@ -1,12 +1,21 @@
 <script>
     import Logo from "./Logo.svelte";
     import Button from "./Button.svelte";
+    import {isAuthenticated} from "../store/authStore";
 
     export let y;
 
-    export let tabs = [
+    export let unauthTabs = [
         {name: "Prijava", link: "/login"},
     ];
+    export let employeeTabs = [
+        {name: "Dodaj oglas", link: "/add"},
+        {name: "Moj profil", link: "/profile"},
+        {name: "Odjava", link: "/logout"},
+    ];
+
+    let tabs;
+    $: tabs = $isAuthenticated ? employeeTabs : unauthTabs;
 </script>
 
 <header
@@ -20,7 +29,7 @@
             <a
                     href={tab.link}
                     class="duration-200 hover:text-primary"
-                    target={index === 2 ? "_blank" : ""}
+                    target={tab.name === "Odjava" ? "_self" : ""}
             >
                 <p>{tab.name}</p>
             </a>

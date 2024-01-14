@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as repl from "repl";
+    import {isAuthenticated} from "../../store/authStore";
 
     let username: string = '';
     let password: string = '';
@@ -11,6 +11,36 @@
 
     function validateEmail(email: string) {
         return /\S+@\S+\.\S+/.test(email);
+    }
+
+    async function getUser() {
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            const options = {
+                method: 'GET',
+                headers: {
+                    'Authorization': `${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            const response = await fetch(`${BACKEND_URL}/user/withToken`, options);
+            if (response.ok) {
+                const data = await response.json();
+                const userId = data.id;
+
+                const userResponse = await fetch(`${BACKEND_URL}/user?id=${userId}`, options);
+                if (userResponse.ok) {
+                    if (typeof window !== 'undefined') {
+                        const user = await userResponse.json();
+                        return user;
+                    }
+                } else {
+                    throw new Error('Failed to fetch user object');
+                }
+            } else {
+                throw new Error('Failed to fetch user data');
+            }
+        }
     }
 
     async function handleLogin() {
@@ -33,9 +63,17 @@
         console.log(tokenData);
         localStorage.setItem('token', tokenData['accessToken']);
         errorMessage = '';
+        isAuthenticated.set(true);
+
+        // Fetch the user object and store it in localStorage
+        try {
+            const user = await getUser();
+            localStorage.setItem('user', JSON.stringify(user));
+        } catch (error) {
+            console.error('Failed to fetch user object', error);
+        }
 
         window.location.href = '/profile';
-
     }
 </script>
 
