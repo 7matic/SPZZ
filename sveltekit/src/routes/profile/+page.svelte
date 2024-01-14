@@ -3,64 +3,41 @@
     import UploadCV from "../../components/UploadCV.svelte";
     import Button from "../../components/Button.svelte";
     import Card from "../../components/Card.svelte";
+    import {makeRequest} from "../../api/api";
 
     let user: User;
     let loading = true;
-
-    let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
-
+    let infoMessage = '';
 
     async function getUser() {
         if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('token');
-            const options = {
-                method: 'GET',
-                headers: {
-                    'Authorization': `${token}`,
-                    'Content-Type': 'application/json'
-                }
-            };
-            const response = await fetch(`${BACKEND_URL}/user/withToken`, options);
-            if (response.ok) {
-                const data = await response.json();
-                const userId = data.id;
-
-                // Fetch the user object using the id
-                const userResponse = await fetch(`${BACKEND_URL}/user?id=${userId}`, options);
-                if (userResponse.ok) {
-                    user = await userResponse.json();
-                    loading = false;
-                } else {
-                    throw new Error('Failed to fetch user object');
-                }
-            } else {
-                throw new Error('Failed to fetch user data');
+            try {
+                const response = await makeRequest(`/user/withToken`, 'GET');
+                const userId = response.id;
+                const userResponse = await makeRequest(`/user?id=${userId}`, 'GET');
+                return userResponse;
+            } catch (e) {
+                console.log(e);
             }
         }
     }
 
     async function handleSubmit() {
         if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('token');
-            const options = {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(user)
-            };
-            const response = await fetch(`${BACKEND_URL}/user/update`, options);
-            if (response.ok) {
-                console.log('User updated successfully');
-            } else {
-                throw new Error('Failed to update user');
+            try {
+                user = await makeRequest(`/user/update`, 'PUT', user);
+                infoMessage = 'Profil uspešno posodobljen.';
+            } catch (e) {
+                console.log(e);
+                infoMessage = 'Profil ni bil uspešno posodobljen. Prosimo, poskusite ponovno.';
             }
         }
+
     }
-    
+
     onMount(async () => {
-        await getUser();
+        user = await getUser();
+        loading = false;
     });
 </script>
 
@@ -122,6 +99,9 @@
                           rows="4"
                           bind:value={user.skills}/>
             </div>
+            {#if infoMessage}
+                <p class="text-dark col-span-2">{infoMessage}</p>
+            {/if}
             <Button className="col-span-2"
                     type="submit">Shrani
             </Button>

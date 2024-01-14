@@ -4,10 +4,6 @@
     let step: number = 1;
     let userType: 'user' | 'company' = 'user';
 
-    let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
-    let errorMessage: string | null = null;
-    let isLoading: boolean = false;
-
     function setUserType(type: 'user' | 'company') {
         userType = type;
         step++;

@@ -1,12 +1,12 @@
 <script lang="ts">
     import {isAuthenticated} from "../../store/authStore";
+    import {makeRequest} from "../../api/api";
 
     let username: string = '';
     let password: string = '';
     let errorMessage: string = '';
     let isDisabled: boolean = true;
 
-    let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
     $: isDisabled = !username || !password || !validateEmail(username) || password.length < 8;
 
     function validateEmail(email: string) {
@@ -15,66 +15,35 @@
 
     async function getUser() {
         if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('token');
-            const options = {
-                method: 'GET',
-                headers: {
-                    'Authorization': `${token}`,
-                    'Content-Type': 'application/json'
-                }
-            };
-            const response = await fetch(`${BACKEND_URL}/user/withToken`, options);
-            if (response.ok) {
-                const data = await response.json();
-                const userId = data.id;
-
-                const userResponse = await fetch(`${BACKEND_URL}/user?id=${userId}`, options);
-                if (userResponse.ok) {
-                    if (typeof window !== 'undefined') {
-                        const user = await userResponse.json();
-                        return user;
-                    }
-                } else {
-                    throw new Error('Failed to fetch user object');
-                }
-            } else {
-                throw new Error('Failed to fetch user data');
+            try {
+                const response = await makeRequest(`/user/withToken`, 'GET');
+                const userId = response.id;
+                const userResponse = await makeRequest(`/user?id=${userId}`, 'GET');
+                return userResponse;
+            } catch (e) {
+                console.log(e);
             }
         }
     }
 
     async function handleLogin() {
-        const response = await fetch(`${BACKEND_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: username,
-                password: password
-            })
-        });
-        if (!response.ok) {
-            errorMessage = 'Prijava ni uspela. Poskusite ponovno.';
-            console.error('Login failed');
-            return;
-        }
-        const tokenData = await response.json();
-        console.log(tokenData);
-        localStorage.setItem('token', tokenData['accessToken']);
-        errorMessage = '';
-        isAuthenticated.set(true);
-
-        // Fetch the user object and store it in localStorage
         try {
+            const tokenData = await makeRequest(`/auth/login`, 'POST', {
+                    email: username,
+                    password: password
+                }
+            );
+            localStorage.setItem('token', tokenData['accessToken']);
+            errorMessage = '';
+            isAuthenticated.set(true);
             const user = await getUser();
             localStorage.setItem('user', JSON.stringify(user));
-        } catch (error) {
-            console.error('Failed to fetch user object', error);
+            window.location.href = '/profile';
+        } catch (e) {
+            errorMessage = 'Prijava ni uspela. Poskusite ponovno.';
         }
-
-        window.location.href = '/profile';
     }
+
 </script>
 
 <div class="flex flex-grow items-center justify-center min-h-100 font-sans">
