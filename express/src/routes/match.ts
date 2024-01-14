@@ -1,5 +1,5 @@
 import express from 'express';
-import { getMatch, matchAllJobOffersForUser } from '../controllers/match';
+import { calculateMatchesForJob, getMatch, matchAllJobOffersForUser } from '../controllers/match';
 import { verifyAccessToken } from '../../lib/jwt';
 import { IGetUserAuthInfoRequest } from '../../lib/types';
 
@@ -24,6 +24,14 @@ matchRouter.get(`/match/:userId/:jobOfferId`, async (req, res) => {
         res.json(result)
     else
         res.json({ error: "Match not found!" })
+});
+
+matchRouter.get('/matchJobToUsers', async (req, res) => {
+    const jobOfferId = req.query.id as string;
+
+    await calculateMatchesForJob(jobOfferId);
+
+    res.json({ message: "Matched all users to job offer!" });
 });
 
 export { matchRouter };
