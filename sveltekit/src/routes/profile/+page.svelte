@@ -4,7 +4,7 @@
     import Button from "../../components/Button.svelte";
     import Card from "../../components/Card.svelte";
 
-    let user;
+    let user: User;
     let loading = true;
 
     let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
@@ -40,9 +40,25 @@
     }
 
     async function handleSubmit() {
-        // Send the updated user data to your server
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            const options = {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            };
+            const response = await fetch(`${BACKEND_URL}/user/update`, options);
+            if (response.ok) {
+                console.log('User updated successfully');
+            } else {
+                throw new Error('Failed to update user');
+            }
+        }
     }
-
+    
     onMount(async () => {
         await getUser();
     });

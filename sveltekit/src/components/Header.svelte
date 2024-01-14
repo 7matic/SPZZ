@@ -6,12 +6,13 @@
     export let y;
 
     export let unauthTabs = [
-        {name: "Prijava", link: "/login"},
+        {name: "Prijava", link: "/login", icon: "fas fa-sign-in-alt"},
     ];
     export let employeeTabs = [
-        {name: "Dodaj oglas", link: "/add"},
-        {name: "Moj profil", link: "/profile"},
-        {name: "Odjava", link: "/logout"},
+        {name: "Uredi profil", link: "/profile", icon: "fas fa-user-edit"},
+        {name: "Moje prijave", link: "/applications", icon: "fas fa-file-alt"},
+        {name: "Odjava", link: "/logout", icon: "fas fa-sign-out-alt"},
+        {name: "Pregled oglasov", link: "/ads", icon: "fas fa-bullhorn", variation: "primary"},
     ];
 
     let tabs;
@@ -26,16 +27,30 @@
     </a>
     <div class="sm:flex items-center gap-4 hidden font-sans">
         {#each tabs as tab, index}
-            <a
-                    href={tab.link}
-                    class="duration-200 hover:text-primary"
-                    target={tab.name === "Odjava" ? "_self" : ""}
-            >
-                <p>{tab.name}</p>
-            </a>
+            {#if tab.variation === 'primary'}
+                <a href={tab.link}
+                   target={"_self"}
+                   rel="prefetch"
+                >
+                    <Button text={tab.name}
+                            variation="primary"
+                            href={tab.link}
+                            icon={tab.icon}
+                    />
+                </a>
+            {:else}
+                <a
+                        rel="prefetch"
+                        href={tab.link}
+                        class={`duration-200 hover:text-primary flex items-center`}
+                        target={tab.name === "Odjava" ? "_self" : ""}
+                >
+                    <i class={`${tab.icon} mr-2`}></i>
+                    <p>{tab.name}</p>
+                </a>
+            {/if}
+
         {/each}
-        <Button text="Pregled oglasov"
-                variation="primary"
-        />
+
     </div>
 </header>

@@ -50,9 +50,10 @@
 <div>
     <h2 class="mb-4 text-2xl font-bold text-gray-700">Naložite svoj CV</h2>
     <form
-            on:submit={handleSubmit}
+            on:submit={handleSubmit} class="color-primary"
     >
-        <input type="file" name="file" bind:this={fileInput} on:change={handleFileChange} required/>
+        <input type="file" name="file" bind:this={fileInput} on:change={handleFileChange} required class="text-primary"
+        />
         <Button type="submit"
         >
             Naložite
