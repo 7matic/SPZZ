@@ -16,7 +16,7 @@
 </script>
 
 <div
-        class="container relative flex flex-col max-w-[1400px] mx-auto w-full text-sm sm:text-base min-h-screen"
+        class="container relative flex flex-col mx-auto w-full text-sm sm:text-base min-h-screen "
 >
     <div class="fixed bottom-0 right-0 w-auto h-auto p-10 z-[10]">
         <div
@@ -27,7 +27,7 @@
         >
             <button
                     on:click={goTop}
-                    class="ml-auto rounded-full bg-slate-900 text-primary px-3 sm:px-4 hover:bg-slate-800 cursor-pointer aspect-square grid place-items-center"
+                    class="ml-auto rounded-full bg-primary text-primary px-3 sm:px-4 hover:bg-light cursor-pointer aspect-square grid place-items-center"
             >
                 <i class="fa-solid fa-arrow-up"/>
             </button>

@@ -1,17 +1,49 @@
 <script lang="ts">
+    import {isAuthenticated} from "../../store/authStore";
+
     let username: string = '';
     let password: string = '';
     let errorMessage: string = '';
     let isDisabled: boolean = true;
 
     let BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL_FROM_SERVER;
-    $: isDisabled = !username || !password || !validateEmail(username);
+    $: isDisabled = !username || !password || !validateEmail(username) || password.length < 8;
 
     function validateEmail(email: string) {
         return /\S+@\S+\.\S+/.test(email);
     }
 
-    async function handleRegister() {
+    async function getUser() {
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            const options = {
+                method: 'GET',
+                headers: {
+                    'Authorization': `${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            const response = await fetch(`${BACKEND_URL}/user/withToken`, options);
+            if (response.ok) {
+                const data = await response.json();
+                const userId = data.id;
+
+                const userResponse = await fetch(`${BACKEND_URL}/user?id=${userId}`, options);
+                if (userResponse.ok) {
+                    if (typeof window !== 'undefined') {
+                        const user = await userResponse.json();
+                        return user;
+                    }
+                } else {
+                    throw new Error('Failed to fetch user object');
+                }
+            } else {
+                throw new Error('Failed to fetch user data');
+            }
+        }
+    }
+
+    async function handleLogin() {
         const response = await fetch(`${BACKEND_URL}/auth/login`, {
             method: 'POST',
             headers: {
@@ -22,20 +54,30 @@
                 password: password
             })
         });
-
         if (!response.ok) {
             errorMessage = 'Prijava ni uspela. Poskusite ponovno.';
             console.error('Login failed');
             return;
         }
-
-        const data = await response.json();
-        console.log(data);
+        const tokenData = await response.json();
+        console.log(tokenData);
+        localStorage.setItem('token', tokenData['accessToken']);
         errorMessage = '';
+        isAuthenticated.set(true);
+
+        // Fetch the user object and store it in localStorage
+        try {
+            const user = await getUser();
+            localStorage.setItem('user', JSON.stringify(user));
+        } catch (error) {
+            console.error('Failed to fetch user object', error);
+        }
+
+        window.location.href = '/profile';
     }
 </script>
 
-<div class="flex flex-grow items-center justify-center min-h-100 bg-gray-200 font-sans">
+<div class="flex flex-grow items-center justify-center min-h-100 font-sans">
     <div class="p-16 bg-white rounded shadow-2xl w-full max-w-md mx-auto">
         <h2 class="mb-10 text-3xl font-bold text-gray-800">Prijavite se</h2>
         <div class="space-y-5">
@@ -46,12 +88,12 @@
                        placeholder="E-poštni naslov">
             </div>
             <div>
-                <label class="block mb-1 font-bold text-gray-500">Geslo</label>
+                <label class="block mb-1 font-bold text-gray-500">Geslo (vsaj 8 znakov)</label>
                 <input type="password" bind:value={password} minlength="8"
                        class="w-full border-2 border-gray-200 p-3 rounded outline-none focus:border-primary text-gray-800"
                        placeholder="Geslo">
             </div>
-            <button on:click={handleRegister} disabled={isDisabled}
+            <button on:click={handleLogin} disabled={isDisabled}
                     class="{isDisabled ? 'bg-gray-500' : 'bg-primary'} transform transition-background duration-200 block w-full hover:bg-light p-4 rounded text-white font-bold">
                 Prijava
             </button>
