@@ -1,5 +1,6 @@
 <script lang="ts">
     import Button from "./Button.svelte";
+    import {makeRequest} from "../api/api";
 
     let file: File | null = null;
     let fileInput: HTMLInputElement;
@@ -38,6 +39,7 @@
                 }
                 window.location.href = '/profile';
                 errorMessage = null;
+                await makeRequest('/match', 'GET');
             } catch (error) {
                 errorMessage = error.message;
             } finally {
