@@ -28,7 +28,7 @@
     });
 </script>
 
-<div id="chat-container" class={`w-full my-16`}>
+<div id="chat-container" class={`w-full mt-16 mb-8`}>
     <div class="bg-white shadow-md rounded-lg w-full">
         <div id="chatbox" class="p-4 h-80 overflow-y-auto w-full">
             {#each messages as message (message.id)}

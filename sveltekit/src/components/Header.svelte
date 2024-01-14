@@ -19,7 +19,6 @@
         {name: "Uredi profil", link: "/profile", icon: "fas fa-user-edit"},
         {name: "Razpisani oglasi", link: "/applications", icon: "fas fa-file-alt"},
         {name: "Odjava", link: "/logout", icon: "fas fa-sign-out-alt"},
-        {name: "Pregled oglasov", link: "/jobs", icon: "fas fa-bullhorn", variation: "primary"},
     ];
 
     let user = null;
