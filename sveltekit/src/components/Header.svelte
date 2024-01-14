@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Logo from "./Logo.svelte";
     import Button from "./Button.svelte";
     import {isAuthenticated} from "../store/authStore";
@@ -15,8 +15,25 @@
         {name: "Pregled oglasov", link: "/jobs", icon: "fas fa-bullhorn", variation: "primary"},
     ];
 
+    export let employerTabs = [
+        {name: "Uredi profil", link: "/profile", icon: "fas fa-user-edit"},
+        {name: "Razpisani oglasi", link: "/applications", icon: "fas fa-file-alt"},
+        {name: "Odjava", link: "/logout", icon: "fas fa-sign-out-alt"},
+        {name: "Pregled oglasov", link: "/jobs", icon: "fas fa-bullhorn", variation: "primary"},
+    ];
+
+    let user = null;
+    let companyExists = false;
+    if (typeof window !== 'undefined') {
+        let userJson: string = localStorage.getItem("user");
+        user = userJson ? JSON.parse(userJson) : null;
+        companyExists = user?.company ? true : false;
+        console.log(user);
+    }
     let tabs;
-    $: tabs = $isAuthenticated ? employeeTabs : unauthTabs;
+    $: tabs = $isAuthenticated ? (companyExists ? employerTabs : employeeTabs) : unauthTabs;
+
+
 </script>
 
 <header
