@@ -18,6 +18,8 @@ export async function getSortedJobsWithMatches(
     include: {
       position: {
         select: {
+          requirements: true,
+          description: true,
           title: true,
           company: {
             select: {
@@ -26,6 +28,11 @@ export async function getSortedJobsWithMatches(
             },
           },
         },
+      },
+      applicants: {
+        select: {
+          id: true,
+        }
       },
       matches: {
         select: {
@@ -77,15 +84,15 @@ export async function applyToJob(
         applicants: {
           ...(applied
             ? {
-                connect: {
-                  id: Number(user_id),
-                },
-              }
+              connect: {
+                id: Number(user_id),
+              },
+            }
             : {
-                disconnect: {
-                  id: Number(user_id),
-                },
-              }),
+              disconnect: {
+                id: Number(user_id),
+              },
+            }),
         },
       },
     });

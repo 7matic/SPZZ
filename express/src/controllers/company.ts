@@ -97,8 +97,6 @@ export async function chooseApplicants(companyId: number, jobId: number, user_id
                             }
                         },
                         isFilled: true,
-                        startDate: new Date(),
-                        endDate: undefined
                     }
                 },
             },

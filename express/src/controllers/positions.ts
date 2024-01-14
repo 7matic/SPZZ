@@ -20,8 +20,6 @@ export async function createPosition(Position: Position, companyId: number) {
                 description: Position.description,
                 requirements: Position.requirements,
                 title: Position.title,
-                startDate: Position.startDate,
-                endDate: Position.endDate,
                 company: {
                     connect: {
                         id: companyId
