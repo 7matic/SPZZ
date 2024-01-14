@@ -83,6 +83,9 @@ export async function calculateMatchesForJob(jobOfferId: string) {
 
     for (const user of users) {
 
+        if (!user.skills)
+            continue
+
         const match_percentage = await fetch('http://py-algorithms:5000/job_match', {
             method: 'POST',
             headers: {
@@ -95,8 +98,6 @@ export async function calculateMatchesForJob(jobOfferId: string) {
         });
 
         const match_percentage_json = await match_percentage.json() as PyResponse;
-
-        console.log(match_percentage_json);
 
         const match = await prisma.match.upsert({
             where: {
