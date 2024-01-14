@@ -1,5 +1,6 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library";
 import prisma from "../../lib/db";
+import { Company } from "@prisma/client";
 
 export async function postCompany(user_id: number, name: string, logo: string, location: string) {
     const company = await prisma.company.create({
@@ -15,6 +16,29 @@ export async function postCompany(user_id: number, name: string, logo: string, l
         },
     })
     return company;
+}
+
+export async function updateCompany(company: Company, userId: number) {
+
+    let companyFromDb;
+    try {
+        companyFromDb = await prisma.company.update({
+            where: {
+                userId: userId
+            },
+            data: {
+                location: company.location,
+                logo: company.logo,
+                name: company.name,
+            }
+        });
+    }
+    catch (e) {
+        null
+    }
+
+    if (companyFromDb)
+        return companyFromDb
 }
 
 export async function getCompany(id: string) {
@@ -47,6 +71,19 @@ export async function getPositions(id: string) {
     })
 
     return positions;
+}
+
+export async function getJobOffers(id: string) {
+    const jobOffers = await prisma.jobOffer.findMany({
+        where: {
+            companyId: Number(id),
+        },
+        include: {
+            position: true,
+        }
+    })
+
+    return jobOffers;
 }
 
 export async function getJobApplicants(jobId: string, companyId: number) {

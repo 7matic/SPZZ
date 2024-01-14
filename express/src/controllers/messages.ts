@@ -1,28 +1,34 @@
 import prisma from "../../lib/db";
 
-export async function sendMessage(sentFrom: number, sentTo: number, content: string){
-    const userFrom = await prisma.user.update({
-        where: {
-            id: sentFrom
-        },
-        data: {
-            senderMessages: {
-                create: {
-                    recipient: {
-                        connect: {
-                            id: sentTo
-                        }
-                    },
-                    content: content
+export async function sendMessage(sentFrom: number, sentTo: number, content: string) {
+
+    try {
+        const userFrom = await prisma.user.update({
+            where: {
+                id: sentFrom
+            },
+            data: {
+                senderMessages: {
+                    create: {
+                        recipient: {
+                            connect: {
+                                id: sentTo
+                            }
+                        },
+                        content: content
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+    catch (e) {
+        return { error: "Problem sending message!" }
+    }
 
-    return userFrom;
+    return { message: "Message succesfully sent!" };
 }
 
-export async function getConversations(userId: number){
+export async function getConversations(userId: number) {
     const messages = await prisma.message.findMany({
         where: {
             OR: [
@@ -35,12 +41,14 @@ export async function getConversations(userId: number){
                 select: {
                     id: true,
                     email: true,
+                    company: true
                 }
             },
             recipient: {
                 select: {
                     id: true,
                     email: true,
+                    company: true
                 }
             }
         }
@@ -51,17 +59,19 @@ export async function getConversations(userId: number){
     messages.forEach(message => {
         const otherId = message.recipient.id == userId ? message.sender.id : message.recipient.id;
         const otherEmail = message.recipient.id == userId ? message.sender.email : message.recipient.email;
-        const pair = [userId, otherId, otherEmail].join(',');
+        const otherCompanyName = message.recipient.id == userId ? message.sender.company?.name : message.recipient.company?.name;
+        const otherCompanyLogo = message.recipient.id == userId ? message.sender.company?.logo : message.recipient.company?.logo;
+        const pair = [userId, otherId, otherEmail, otherCompanyName, otherCompanyLogo].join(',');
         conversationPairs.add(pair);
     });
 
     return Array.from(conversationPairs).map((pair: any) => {
-        const [userId, otherId, otherEmail] = pair.split(',').map(String);
-        return { userId, otherId, otherEmail };
+        const [userId, otherId, otherEmail, otherCompanyName, otherCompanyLogo] = pair.split(',').map(String);
+        return { userId, otherId, otherEmail, otherCompanyName, otherCompanyLogo };
     });
 }
 
-export async function getConversation(sentFrom: number, sentTo: number){
+export async function getConversation(sentFrom: number, sentTo: number) {
     const messages = await prisma.message.findMany({
         where: {
             OR: [
@@ -82,6 +92,27 @@ export async function getConversation(sentFrom: number, sentTo: number){
                     }
                 }
             ]
+        },
+        select: {
+            sender: {
+                select: {
+                    id: true,
+                    email: true,
+                    company: true
+                }
+            },
+            recipient: {
+                select: {
+                    id: true,
+                    email: true,
+                    company: true
+                }
+            },
+            content: true,
+            createdAt: true
+        },
+        orderBy: {
+            createdAt: 'asc'
         }
     });
 

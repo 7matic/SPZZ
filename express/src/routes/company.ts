@@ -1,5 +1,5 @@
 import express, { RequestHandler } from 'express';
-import { chooseApplicants, getAllCompanies, getCompany, getJobApplicants, getPositions, postCompany } from '../controllers/company';
+import { chooseApplicants, getAllCompanies, getCompany, getJobApplicants, getJobOffers, getPositions, postCompany, updateCompany } from '../controllers/company';
 import { verifyAccessToken } from '../../lib/jwt';
 import { IGetUserAuthInfoRequest } from '../../lib/types';
 
@@ -29,10 +29,32 @@ companyRouter.post('/create', verifyAccessToken as RequestHandler, async (req: I
         res.json({ error: "Company not found!" })
 });
 
+companyRouter.put('/update', verifyAccessToken as RequestHandler, async (req: IGetUserAuthInfoRequest, res) => {
+    const { body } = req;
+
+    const company = await updateCompany(body, req.user?.id!);
+
+    if (company)
+        res.json(company);
+    else
+        res.status(500).json({ error: "Company not updated!" })
+})
+
 companyRouter.get('/positions', async (req, res) => {
     const { id } = req.query;
 
     const positions = await getPositions(String(id));
+
+    if (positions != null)
+        res.json(positions)
+    else
+        res.json({ error: "Positions not found!" })
+});
+
+companyRouter.get('/jobOffers', async (req, res) => {
+    const { id } = req.query;
+
+    const positions = await getJobOffers(String(id));
 
     if (positions != null)
         res.json(positions)
