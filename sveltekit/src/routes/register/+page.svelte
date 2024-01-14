@@ -16,7 +16,12 @@
 
     async function handleRegister() {
         try {
-            const tokenData = await makeRequest(`/auth/register`, 'POST', {
+            const reg = await makeRequest(`/auth/register`, 'POST', {
+                    email: username,
+                    password: password
+                }
+            );
+            const tokenData = await makeRequest(`/auth/login`, 'POST', {
                     email: username,
                     password: password
                 }

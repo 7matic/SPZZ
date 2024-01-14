@@ -16,12 +16,13 @@
         const userId = user.id;
 
         try {
-            await makeRequest('/company', 'POST', {
+            await makeRequest('/company/create', 'POST', {
                 name,
                 logo,
                 location,
                 userId
             });
+            window.location.href = '/profile';
         } catch (error) {
             errorMessage = error.message;
         } finally {
