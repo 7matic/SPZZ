@@ -73,6 +73,19 @@ export async function getPositions(id: string) {
     return positions;
 }
 
+export async function getJobOffers(id: string) {
+    const jobOffers = await prisma.jobOffer.findMany({
+        where: {
+            companyId: Number(id),
+        },
+        include: {
+            position: true,
+        }
+    })
+
+    return jobOffers;
+}
+
 export async function getJobApplicants(jobId: string, companyId: number) {
     const applicants = await prisma.jobOffer.findUnique({
         where: {
