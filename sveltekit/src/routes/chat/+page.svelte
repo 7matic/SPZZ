@@ -13,14 +13,14 @@
     let talkingToCompany = false;
 
     const fetchMessages = async () => {
-        const id = talkingToCompany ? companyId : userId;
+        const id = talkingToCompany ? companyData.userId : userId;
         const data = await makeRequest(`/messages/conversation?user2=${id}`, 'GET');
         messages = data;
     };
 
     const sendMessage = async () => {
         const message = {
-            "sentTo": Number.parseInt(companyId),
+            "sentTo": Number.parseInt(talkingToCompany ? companyData.userId : userId),
             "content": newMessage
         };
         const data = await makeRequest('/messages/send', 'POST', message);
