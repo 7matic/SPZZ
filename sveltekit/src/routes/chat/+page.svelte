@@ -1,14 +1,20 @@
-<script>
+<script lang="ts">
     import {onMount} from 'svelte';
     import {page} from '$app/stores';
     import {makeRequest} from "../../api/api";
+    import CompanyHeader from "../../components/ChatHeader.svelte";
 
     let messages = [];
     let newMessage = '';
     let companyId;
+    let userId;
+    let companyData = null;
+    let userData = null;
+    let talkingToCompany = false;
 
     const fetchMessages = async () => {
-        const data = await makeRequest(`/messages/conversation?user2=${companyId}`, 'GET');
+        const id = talkingToCompany ? companyId : userId;
+        const data = await makeRequest(`/messages/conversation?user2=${id}`, 'GET');
         messages = data;
     };
 
@@ -23,12 +29,27 @@
     };
 
     onMount(async () => {
-        companyId = $page.url.searchParams.get('user2');
+        companyId = $page.url.searchParams.get('company');
+        userId = $page.url.searchParams.get('user');
+        if (!companyId && !userId) {
+            window.location.href = '/profile';
+        }
+        if (companyId) {
+            companyData = await makeRequest(`/company?id=${companyId}`, 'GET');
+            talkingToCompany = true;
+        } else {
+            userData = await makeRequest(`/user?id=${userId}`, 'GET');
+            talkingToCompany = false;
+        }
         await fetchMessages();
     });
 </script>
 
 <div id="chat-container" class={`w-full mt-16 mb-8`}>
+    <CompanyHeader
+            talkingToCompany={talkingToCompany}
+            data={talkingToCompany ? companyData : userData}
+    />
     <div class="bg-white shadow-md rounded-lg w-full">
         <div id="chatbox" class="p-4 h-80 overflow-y-auto w-full">
             {#each messages as message (message.id)}

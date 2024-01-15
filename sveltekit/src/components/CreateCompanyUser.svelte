@@ -1,6 +1,6 @@
 <script lang="ts">
     import Button from "./Button.svelte";
-    import {makeRequest} from "../api/api";
+    import {getUser, makeRequest} from "../api/api";
 
     let name: string = '';
     let logo: string = '';
@@ -22,6 +22,8 @@
                 location,
                 userId
             });
+            const user = await getUser();
+            localStorage.setItem('user', JSON.stringify(user));
             window.location.href = '/profile';
         } catch (error) {
             errorMessage = error.message;

@@ -211,9 +211,11 @@
                             on:click={applyNow}>
                         {getApplyButtonText(selectedJobOffer)}
                     </Button>
-                    <Button>
-                        Komunicirajte s podjetjem
-                    </Button>
+                    <a href="/chat?company={selectedJobOffer.companyId}">
+                        <Button>
+                            Komunicirajte s podjetjem
+                        </Button>
+                    </a>
                 </div>
             {/if}
         </div>
