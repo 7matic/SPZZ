@@ -11,40 +11,61 @@ export async function getSortedJobsWithMatches(
     skip: page ? Number(page) * 10 : undefined,
     take: page ? 10 : undefined,
     orderBy:
-      sort && sort_mode ? { [String(sort)]: String(sort_mode) } : undefined,
+      sort && sort !== "match" && sort_mode ? { [String(sort)]: String(sort_mode) } : undefined,
   };
 
-  const jobs = await prisma.jobOffer.findMany({
-    include: {
-      position: {
-        select: {
-          requirements: true,
-          description: true,
-          title: true,
-          company: {
-            select: {
-              name: true,
-              logo: true,
+  let jobs;
+
+  try {
+    jobs = await prisma.jobOffer.findMany({
+      include: {
+        position: {
+          select: {
+            requirements: true,
+            description: true,
+            title: true,
+            company: {
+              select: {
+                name: true,
+                logo: true,
+              },
             },
           },
         },
-      },
-      applicants: {
-        select: {
-          id: true,
-        }
-      },
-      matches: {
-        select: {
-          score: true,
+        applicants: {
+          select: {
+            id: true,
+          }
         },
-        where: {
-          userId: Number(userId),
+        matches: {
+          select: {
+            score: true,
+          },
+          where: {
+            userId: Number(userId),
+          },
         },
       },
-    },
-    ...findOptions,
-  });
+      ...findOptions,
+    });
+  }
+  catch (e) {
+    return null;
+  }
+
+  if (sort === "match") {
+    jobs.sort((a, b) => {
+      if (a.matches.length === 0) {
+        return 1;
+      }
+      if (b.matches.length === 0) {
+        return -1;
+      }
+      return sort_mode === 'asc'
+        ? Number(a.matches[0].score) - Number(b.matches[0].score)
+        : Number(b.matches[0].score) - Number(a.matches[0].score);
+    })
+  }
 
   return jobs;
 }

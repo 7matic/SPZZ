@@ -10,6 +10,9 @@ positionRouter.get(`/`, async (req, res) => {
 
     const positions = await getPosition(String(id));
 
+    if(!positions){
+        return res.status(400).json({ error: "Positions not found!" });
+    }
     res.json(positions);
 });
 
@@ -39,8 +42,9 @@ positionRouter.delete(`/delete`, verifyAccessToken , async (req : IGetUserAuthIn
 
 positionRouter.put(`/update`, verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
     const { body } = req;
+    const { id } = req.query;
 
-    const position = await updatePosition(body, req.user?.company_id!);
+    const position = await updatePosition(body, Number(id),  req.user?.company_id!);
 
     if(!position){
         return res.status(400).json({ error: "Position not updated!" });
