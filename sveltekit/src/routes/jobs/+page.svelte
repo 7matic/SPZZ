@@ -11,12 +11,25 @@
     let appliedJobs: Set<string> = new Set();
     let sort = 'salary';
     let sort_mode = 'desc';
+    let currentPage = 0;
 
-    async function loadJobs(sort: string = 'salary', sort_mode: string = 'desc') {
+    function previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            loadJobs(currentPage, sort, sort_mode);
+        }
+    }
+
+    function nextPage() {
+        currentPage++;
+        loadJobs(currentPage, sort, sort_mode);
+    }
+
+    async function loadJobs(currentPage: number = 0, sort: string = 'salary', sort_mode: string = 'desc') {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const userId = user.id;
-            data = await makeRequest(`/jobs/all?sort=${sort}&sort_mode=${sort_mode}&page=0`, 'GET');
+            data = await makeRequest(`/jobs/all?sort=${sort}&sort_mode=${sort_mode}&page=${currentPage}`, 'GET');
             data.forEach(jobOffer => {
                 const userHasApplied = jobOffer.applicants.some(
                     (applicant) => applicant.id === userId
@@ -213,6 +226,11 @@
                     </a>
                 </div>
             {/if}
+            <div class="pagination">
+                <button on:click={previousPage}>Previous</button>
+                <span>Page {currentPage + 1}</span>
+                <button on:click={nextPage}>Next</button>
+            </div>
         </div>
     </div>
 {/if}
