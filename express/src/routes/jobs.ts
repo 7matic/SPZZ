@@ -29,8 +29,7 @@ jobsRouter.get("/all", verifyAccessToken, async (req: IGetUserAuthInfoRequest, r
 
   const user_id = req.user?.id;
 
-  if (sort_mode == 'job_match')
-    await matchAllJobOffersForUser(user_id!);
+  await matchAllJobOffersForUser(user_id!);
 
   const jobs = await getSortedJobsWithMatches(
     String(user_id),
@@ -40,42 +39,50 @@ jobsRouter.get("/all", verifyAccessToken, async (req: IGetUserAuthInfoRequest, r
   );
 
   if (jobs != null) res.json(jobs);
-  else res.json({ error: "Jobs not found!" });
+  else res.json({ error: "There was a problem with the parameters!" });
 });
 
 jobsRouter.post("/create", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
-  const joboffer = await prisma.jobOffer.create({
-    data: {
-      startDate: new Date(),
-      endDate: new Date(),
-      companyId: req.user?.company_id!,
-      positionId: Number(req.body.positionId),
-      salary: Number(req.body.salary),
-      active: Boolean(req.body.active),
-      location: String(req.body.location),
-    },
-  });
+  try {
+    const joboffer = await prisma.jobOffer.create({
+      data: {
+        startDate: new Date(),
+        endDate: new Date(),
+        companyId: req.user?.company_id!,
+        positionId: Number(req.body.positionId),
+        salary: Number(req.body.salary),
+        active: Boolean(req.body.active),
+        location: String(req.body.location),
+      },
+    });
 
-  if (joboffer != null) res.json(joboffer);
-  else res.json({ error: "Job not found!" });
+    return res.json(joboffer);
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(400).json({ error: "Job not created!" })
+  }
 });
 
 jobsRouter.put("/update", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
-  const updatedOffer = await prisma.jobOffer.update({
-    where: {
-      id: Number(req.body.id),
-      companyId: req.user?.company_id
-    },
-    data: {
-      salary: Number(req.body.salary),
-      active: Boolean(req.body.active),
-      location: String(req.body.location),
-    },
-  });
-
-  if (updatedOffer) return res.json(updatedOffer);
-
-  return res.status(400).json({ error: "Job not found!" })
+  try {
+    const updatedOffer = await prisma.jobOffer.update({
+      where: {
+        id: Number(req.body.id),
+        companyId: req.user?.company_id
+      },
+      data: {
+        salary: Number(req.body.salary),
+        active: Boolean(req.body.active),
+        location: String(req.body.location),
+      },
+    });
+    res.json(updatedOffer);
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(400).json({ error: "Job not found!" })
+  }
 });
 
 jobsRouter.delete("/delete", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
@@ -87,7 +94,7 @@ jobsRouter.delete("/delete", verifyAccessToken, async (req: IGetUserAuthInfoRequ
   else res.json({ error: "Job not found!" });
 });
 
-jobsRouter.post("/apply_job", verifyAccessToken, async (req : IGetUserAuthInfoRequest, res) => {
+jobsRouter.post("/apply_job", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
   const job_id = req.query.id;
 
   const { applied } = req.body;

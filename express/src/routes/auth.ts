@@ -9,23 +9,31 @@ const authRouter = express.Router();
 authRouter.post(`/login`, async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({
-        where: {
-            email: email
-        },
-        select: {
-            id: true,
-            email: true,
-            hash: true,
-            role: true,
-            company: {
-                select: {
-                    id: true,
-                    name: true,
+    let user = undefined;
+
+    try {
+
+        user = await prisma.user.findUnique({
+            where: {
+                email: email
+            },
+            select: {
+                id: true,
+                email: true,
+                hash: true,
+                role: true,
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+    catch (e) {
+        console.log(e);
+    }
 
     if (!user) return res.status(400).json({ "error": "User not found!" });
 
