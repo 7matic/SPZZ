@@ -14,10 +14,12 @@
 
     async function loadJobs(sort: string = 'salary', sort_mode: string = 'desc') {
         try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user.id;
             data = await makeRequest(`/jobs/all?sort=${sort}&sort_mode=${sort_mode}&page=0`, 'GET');
             data.forEach(jobOffer => {
                 const userHasApplied = jobOffer.applicants.some(
-                    (applicant) => applicant.id === userID
+                    (applicant) => applicant.id === userId
                 );
                 if (userHasApplied) {
                     appliedJobs.add(jobOffer.id);
