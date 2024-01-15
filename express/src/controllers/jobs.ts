@@ -14,37 +14,44 @@ export async function getSortedJobsWithMatches(
       sort && sort !== "match" && sort_mode ? { [String(sort)]: String(sort_mode) } : undefined,
   };
 
-  const jobs = await prisma.jobOffer.findMany({
-    include: {
-      position: {
-        select: {
-          requirements: true,
-          description: true,
-          title: true,
-          company: {
-            select: {
-              name: true,
-              logo: true,
+  let jobs;
+
+  try {
+    jobs = await prisma.jobOffer.findMany({
+      include: {
+        position: {
+          select: {
+            requirements: true,
+            description: true,
+            title: true,
+            company: {
+              select: {
+                name: true,
+                logo: true,
+              },
             },
           },
         },
-      },
-      applicants: {
-        select: {
-          id: true,
-        }
-      },
-      matches: {
-        select: {
-          score: true,
+        applicants: {
+          select: {
+            id: true,
+          }
         },
-        where: {
-          userId: Number(userId),
+        matches: {
+          select: {
+            score: true,
+          },
+          where: {
+            userId: Number(userId),
+          },
         },
       },
-    },
-    ...findOptions,
-  });
+      ...findOptions,
+    });
+  }
+  catch (e) {
+    return null;
+  }
 
   if (sort === "match") {
     jobs.sort((a, b) => {

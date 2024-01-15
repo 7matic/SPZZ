@@ -54,12 +54,12 @@ export async function deletePosition(id: string, companyId: number) {
     return position;
 }
 
-export async function updatePosition(Position: Position, companyId: number) {
+export async function updatePosition(Position: Position, position_id: number, companyId: number) {
     let position;
     try {
         position = await prisma.position.update({
             where: {
-                id: Position.id,
+                id: position_id,
                 companyId: companyId
             },
             data: Position

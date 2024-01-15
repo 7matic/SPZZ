@@ -14,41 +14,46 @@ type PyResponse = {
 };
 
 export async function parseAndWrite(user_id: number, filename: string) {
-    await prisma.user.update({
-        where: {
-            id: user_id
-        },
-        data: {
-            pdfFileName: filename
-        }
-    });
+    try {
+        await prisma.user.update({
+            where: {
+                id: user_id
+            },
+            data: {
+                pdfFileName: filename
+            }
+        });
 
-    const response = await fetch('http://py-algorithms:5000/read_cv_info', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ filename: filename }),
-    });
+        const response = await fetch('http://py-algorithms:5000/read_cv_info', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ filename: filename }),
+        });
 
-    const responseJson = await response.json() as PyResponse;
+        const responseJson = await response.json() as PyResponse;
 
-    console.log(responseJson);
+        console.log(responseJson);
 
-    await prisma.user.update({
-        where: {
-            id: user_id
-        },
-        data: {
-            firstName: responseJson.first_name,
-            lastName: responseJson.last_name,
-            phoneNumber: responseJson.phone_number,
-            location: responseJson.location,
-            designations: responseJson.designations?.join(', '),
-            colleges: responseJson.college?.join(', '),
-            degrees: responseJson.degrees?.join(', '),
-            workExperience: responseJson.work_experience?.join(', '),
-            skills: responseJson.skills?.join(', ')
-        }
-    });  
+        await prisma.user.update({
+            where: {
+                id: user_id
+            },
+            data: {
+                firstName: responseJson.first_name,
+                lastName: responseJson.last_name,
+                phoneNumber: responseJson.phone_number,
+                location: responseJson.location,
+                designations: responseJson.designations?.join(', '),
+                colleges: responseJson.college?.join(', '),
+                degrees: responseJson.degrees?.join(', '),
+                workExperience: responseJson.work_experience?.join(', '),
+                skills: responseJson.skills?.join(', ')
+            }
+        });
+    } catch (error) {
+        console.error("Error while parsing and writing data:", error);
+        // Handle the error accordingly, e.g., log it or return an error response.
+    }
 }
