@@ -43,6 +43,7 @@
             userData = await makeRequest(`/user?id=${userId}`, 'GET');
             talkingToCompany = false;
         }
+
         if (typeof window !== 'undefined') {
             currentLoggedIn = localStorage.getItem("user");
             currentLoggedIn = JSON.parse(currentLoggedIn);
@@ -50,7 +51,6 @@
         await fetchMessages();
         intervalId = setInterval(fetchMessages, 1000);
     });
-
     onDestroy(() => {
         clearInterval(intervalId);
     });
@@ -60,6 +60,7 @@
     <CompanyHeader
             talkingToCompany={talkingToCompany}
             data={talkingToCompany ? companyData : userData}
+            id={talkingToCompany ? companyId : userId}
     />
     <div class="bg-white shadow-md rounded-lg w-full">
         <div id="chatbox" class="p-4 h-80 overflow-y-auto w-full">

@@ -35,8 +35,9 @@ export async function getUser() {
         try {
             const response = await makeRequest(`/user/withToken`, 'GET');
             const userId = response.id;
+            const companyId = response['company_id'];
             const userResponse = await makeRequest(`/user?id=${userId}`, 'GET');
-            return {...userResponse, id: userId};
+            return {...userResponse, id: userId, companyId: companyId};
         } catch (e) {
             console.log(e);
         }
