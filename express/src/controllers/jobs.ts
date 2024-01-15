@@ -11,7 +11,7 @@ export async function getSortedJobsWithMatches(
     skip: page ? Number(page) * 10 : undefined,
     take: page ? 10 : undefined,
     orderBy:
-      sort && sort_mode ? { [String(sort)]: String(sort_mode) } : undefined,
+       sort && sort !== "match" && sort_mode ? { [String(sort)]: String(sort_mode) } : undefined,
   };
 
   const jobs = await prisma.jobOffer.findMany({
@@ -45,6 +45,18 @@ export async function getSortedJobsWithMatches(
     },
     ...findOptions,
   });
+
+  if(sort === "match"){
+    jobs.sort((a, b) => {
+      if(a.matches.length === 0){
+        return 1;
+      }
+      if(b.matches.length === 0){
+        return -1;
+      }
+      return Number(b.matches[0].score) - Number(a.matches[0].score);
+    })
+  }
 
   return jobs;
 }
