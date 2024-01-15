@@ -1,7 +1,7 @@
 <script lang="ts">
-    import {onMount} from 'svelte';
+    import {onDestroy, onMount} from 'svelte';
     import {page} from '$app/stores';
-    import {makeRequest} from "../../api/api";
+    import {getUser, makeRequest} from "../../api/api";
     import CompanyHeader from "../../components/ChatHeader.svelte";
 
     let messages = [];
@@ -11,6 +11,8 @@
     let companyData = null;
     let userData = null;
     let talkingToCompany = false;
+    let currentLoggedIn;
+    let intervalId;
 
     const fetchMessages = async () => {
         const id = talkingToCompany ? companyData.userId : userId;
@@ -41,7 +43,16 @@
             userData = await makeRequest(`/user?id=${userId}`, 'GET');
             talkingToCompany = false;
         }
+        if (typeof window !== 'undefined') {
+            currentLoggedIn = localStorage.getItem("user");
+            currentLoggedIn = JSON.parse(currentLoggedIn);
+        }
         await fetchMessages();
+        intervalId = setInterval(fetchMessages, 1000);
+    });
+
+    onDestroy(() => {
+        clearInterval(intervalId);
     });
 </script>
 
@@ -52,9 +63,9 @@
     />
     <div class="bg-white shadow-md rounded-lg w-full">
         <div id="chatbox" class="p-4 h-80 overflow-y-auto w-full">
-            {#each messages as message (message.id)}
-                <div class={message.sentTo === companyId ? 'mb-2' : 'mb-2 text-right'}>
-                    <p class={message.sentTo === companyId ? 'bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block' : 'bg-blue-500 text-white rounded-lg py-2 px-4 inline-block'}>
+            {#each messages as message (message.createdAt)}
+                <div class={message.sender.id !== currentLoggedIn.id ? 'mb-2' : 'mb-2 text-right'}>
+                    <p class={message.sender.id !== currentLoggedIn.id ? 'bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block' : 'bg-blue-500 text-white rounded-lg py-2 px-4 inline-block'}>
                         {message.content}
                     </p>
                 </div>
