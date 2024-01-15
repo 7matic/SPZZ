@@ -29,9 +29,7 @@ authRouter.post(`/login`, async (req, res) => {
 
     if (!user) return res.status(400).json({ "error": "User not found!" });
 
-    const [salt, hash] = user.hash.split(':');
-
-    const isValid = await verifyPassword(password, hash, Buffer.from(salt));
+    const isValid = await verifyPassword(password, user.hash);
 
     if (!isValid) return res.status(400).json({ "error": "Invalid password!" });
 
@@ -44,11 +42,13 @@ authRouter.post(`/register`, async (req, res) => {
 
     let user = undefined;
 
+    const hash = await hashPassword(password);
+
     try {
         user = await prisma.user.create({
             data: {
                 email: email,
-                hash: await hashPassword(password)
+                hash: hash,
             },
             select: {
                 id: true,
