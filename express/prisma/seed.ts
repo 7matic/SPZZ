@@ -171,7 +171,7 @@ async function main() {
       description: "Develop software for cutting-edge projects.",
       companyId: company1.id,
       requirements:
-        "Strong proficiency in Java and experience with Spring framework.",
+        'Familiar with tools and platforms such as Jira GIT, Jenkins, Ansible. Familiar with C#, C++, Java, Groovy, PLSQL, PowerShell, PeopleCode, JavaScript, Python, HTML, CSS. Familiar with Middleware (ex. Mulesoft, NextAxiom, Weblogic). Familiar with Linux or Windows servers.',
     },
   });
   const position2 = await prisma.position.create({
@@ -180,7 +180,7 @@ async function main() {
       description: "Lead product development and strategy.",
       companyId: company1.id,
       requirements:
-        "Proven experience in product management and leadership skills.",
+        "Proven experience in product management and strategic leadership, with a focus on driving innovation and achieving business objectives. Strong analytical and problem-solving skills, adept at market research and competitor analysis. Excellent communication and collaboration skills, capable of leading cross-functional teams. Demonstrated ability to define and execute product roadmaps, managing the entire product lifecycle. Experience in agile development methodologies and a track record of successful product launches. Familiarity with user experience (UX) design principles. Exceptional organizational and project management skills, with a results-driven mindset. Strong business acumen and understanding of market trends. Bachelor’s degree in a relevant field; MBA is a plus. Certifications such as Certified Scrum Product Owner (CSPO) or Pragmatic Marketing Certified (PMC) are advantageous.",
     },
   });
   const position3 = await prisma.position.create({
