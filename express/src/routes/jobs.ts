@@ -29,8 +29,6 @@ jobsRouter.get("/all", verifyAccessToken, async (req: IGetUserAuthInfoRequest, r
 
   const user_id = req.user?.id;
 
-  await matchAllJobOffersForUser(user_id!);
-
   const jobs = await getSortedJobsWithMatches(
     String(user_id),
     String(sort),
