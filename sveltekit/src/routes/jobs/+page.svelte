@@ -12,16 +12,21 @@
     let sort = 'salary';
     let sort_mode = 'desc';
     let currentPage = 0;
+    let infoText = '';
 
     function previousPage() {
         if (currentPage > 0) {
+            loading = true;
             currentPage--;
+            data = [];
             loadJobs(currentPage, sort, sort_mode);
         }
     }
 
     function nextPage() {
+        loading = true;
         currentPage++;
+        data = [];
         loadJobs(currentPage, sort, sort_mode);
     }
 
@@ -39,6 +44,7 @@
                 }
             });
             loading = false;
+            infoText = '';
         } catch (error) {
             console.error("Error loading jobs:", error);
         }
@@ -128,7 +134,6 @@
         <div class="left-section text-white p-4 flex-1">
             <div class="flex justify-between items-center">
             </div>
-
             <div class="flex font-normal">
                 <div class="w-full p-4 h-[83vh] overflow-y-scroll">
                     <h2 class="text-3xl font-semibold mb-4">Ponudbe dela</h2>
@@ -173,7 +178,13 @@
                             </div>
                         </div>
                     {/each}
+                    <div class="pagination flex justify-between items-center">
+                        <button on:click={previousPage} class="bg-light p-2">Prejšnja stran</button>
+                        <span>Stran {currentPage + 1}</span>
+                        <button on:click={nextPage} class="bg-light p-2">Naslednja stran</button>
+                    </div>
                 </div>
+
             </div>
         </div>
 
@@ -226,11 +237,7 @@
                     </a>
                 </div>
             {/if}
-            <div class="pagination">
-                <button on:click={previousPage}>Previous</button>
-                <span>Page {currentPage + 1}</span>
-                <button on:click={nextPage}>Next</button>
-            </div>
+
         </div>
     </div>
 {/if}
