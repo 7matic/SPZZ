@@ -171,7 +171,7 @@
 
                                     {#if jobOffer.matches && jobOffer.matches.length > 0}
                                         <ProgressRadial
-                                                value={jobOffer.matches[0].score * 100}
+                                                value={Math.round(jobOffer.matches[0].score * 100)}
                                                 width={"w-10"}
                                                 font={200}
                                                 meter={jobOffer.matches[0].score * 100 > 80
@@ -185,7 +185,7 @@
                                                 data-theme={"primary"}
                                                 track={"stroke-gray-600"}
                                         >
-                                            {jobOffer.matches[0].score * 100}
+                                            {Math.round(jobOffer.matches[0].score * 100)}
                                         </ProgressRadial>
                                     {/if}
                                 </h5>
