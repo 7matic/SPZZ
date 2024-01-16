@@ -83,11 +83,11 @@ companyRouter.get("/get-job-applicants", verifyAccessToken, async (req: IGetUser
 companyRouter.post("/choose-applicants", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
     const jobId = req.query.id;
 
-    const user_id = req.user?.id;
-
     const { company_id } = req.user!;
 
-    const response = await chooseApplicants(company_id!, Number(jobId), Number(user_id));
+    const chosenId = req.body.user_id;
+
+    const response = await chooseApplicants(company_id!, Number(jobId), Number(chosenId));
 
     if (response != null) res.json("Job updated!");
     else res.json({ error: "Job not found!" });
