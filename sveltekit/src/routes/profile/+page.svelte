@@ -13,14 +13,18 @@
     async function handleSubmit() {
         if (typeof window !== 'undefined') {
             try {
-                user = await makeRequest(`/user/update`, 'PUT', user);
+                if (companyExists) {
+                    user['company'] = await makeRequest(`/company/update`, 'PUT', user['company']);
+                } else {
+                    user = await makeRequest(`/user/update`, 'PUT', user);
+                    await makeRequest('/match', 'GET');
+                }
                 infoMessage = 'Profil uspešno posodobljen.';
             } catch (e) {
                 console.log(e);
                 infoMessage = 'Profil ni bil uspešno posodobljen. Prosimo, poskusite ponovno.';
             }
         }
-
     }
 
     onMount(async () => {

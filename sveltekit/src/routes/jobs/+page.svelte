@@ -2,6 +2,7 @@
     import {onMount} from "svelte";
     import {getUser, makeRequest} from "../../api/api";
     import Button from "../../components/Button.svelte";
+    import {ProgressRadial} from "@skeletonlabs/skeleton";
 
     let selectedJobOffer: any = null;
     let user: any;
@@ -11,19 +12,40 @@
     let appliedJobs: Set<string> = new Set();
     let sort = 'salary';
     let sort_mode = 'desc';
+    let currentPage = 0;
+    let infoText = '';
 
-    async function loadJobs(sort: string = 'salary', sort_mode: string = 'desc') {
+    function previousPage() {
+        if (currentPage > 0) {
+            loading = true;
+            currentPage--;
+            data = [];
+            loadJobs(currentPage, sort, sort_mode);
+        }
+    }
+
+    function nextPage() {
+        loading = true;
+        currentPage++;
+        data = [];
+        loadJobs(currentPage, sort, sort_mode);
+    }
+
+    async function loadJobs(currentPage: number = 0, sort: string = 'salary', sort_mode: string = 'desc') {
         try {
-            data = await makeRequest(`/jobs/all?sort=${sort}&sort_mode=${sort_mode}&page=0`, 'GET');
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user.id;
+            data = await makeRequest(`/jobs/all?sort=${sort}&sort_mode=${sort_mode}&page=${currentPage}`, 'GET');
             data.forEach(jobOffer => {
                 const userHasApplied = jobOffer.applicants.some(
-                    (applicant) => applicant.id === userID
+                    (applicant) => applicant.id === userId
                 );
                 if (userHasApplied) {
                     appliedJobs.add(jobOffer.id);
                 }
             });
             loading = false;
+            infoText = '';
         } catch (error) {
             console.error("Error loading jobs:", error);
         }
@@ -113,7 +135,6 @@
         <div class="left-section text-white p-4 flex-1">
             <div class="flex justify-between items-center">
             </div>
-
             <div class="flex font-normal">
                 <div class="w-full p-4 h-[83vh] overflow-y-scroll">
                     <h2 class="text-3xl font-semibold mb-4">Ponudbe dela</h2>
@@ -144,21 +165,49 @@
                                         alt="Company Logo"
                                 />
                             </div>
-                            <div>
-                                <h5 class="text-2xl text-white font-bold mb-2">
+                            <div class="w-full">
+                                <h5 class="text-2xl text-white font-bold mb-2 flex justify-between w-full">
                                     {jobOffer.position.title}
+
+                                    {#if jobOffer.matches && jobOffer.matches.length > 0}
+                                        <ProgressRadial
+                                                value={jobOffer.matches[0].score * 100}
+                                                width={"w-10"}
+                                                font={200}
+                                                meter={jobOffer.matches[0].score * 100 > 80
+                        ? "stroke-green-800"
+                        : jobOffer.matches[0].score * 100 > 60
+                          ? "stroke-orange-400"
+                          : jobOffer.matches[0].score * 100 > 40
+                            ? "stroke-yellow-800"
+                            : "stroke-red-800"}
+                                                strokeLinecap={"round"}
+                                                data-theme={"primary"}
+                                                track={"stroke-gray-600"}
+                                        >
+                                            {jobOffer.matches[0].score * 100}
+                                        </ProgressRadial>
+                                    {/if}
                                 </h5>
                                 <p class="text-white text-lg">{jobOffer.position.company.name}</p>
+
                                 <p class="text-primary"><span class="font-bold">Lokacija:</span> {jobOffer.location}</p>
                                 <p class="text-primary"><span class="font-bold">Letna plača: </span>{jobOffer.salary} €
                                 </p>
                                 <p class="text-primary text-xs pt-2">
                                     {formatPostedTime(jobOffer.postedAt)}
                                 </p>
+
                             </div>
                         </div>
                     {/each}
+                    <div class="pagination flex justify-between items-center">
+                        <button on:click={previousPage} class="bg-light p-2">Prejšnja stran</button>
+                        <span>Stran {currentPage + 1}</span>
+                        <button on:click={nextPage} class="bg-light p-2">Naslednja stran</button>
+                    </div>
                 </div>
+
             </div>
         </div>
 
@@ -204,11 +253,14 @@
                             on:click={applyNow}>
                         {getApplyButtonText(selectedJobOffer)}
                     </Button>
-                    <Button>
-                        Komunicirajte s podjetjem
-                    </Button>
+                    <a href="/chat?company={selectedJobOffer.companyId}">
+                        <Button>
+                            Komunicirajte s podjetjem
+                        </Button>
+                    </a>
                 </div>
             {/if}
+
         </div>
     </div>
 {/if}
