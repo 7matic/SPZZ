@@ -165,6 +165,16 @@
                     user_id: applicantId,
                 },
             );
+            const message = `Čestitke! Izbrani ste bili za pozicijo: ${selectedJobOffer.position.title}`;
+            await makeRequest(
+                `/messages/send`,
+                "POST",
+                {
+                    sentTo: applicantId,
+                    content: message,
+                },
+            );
+
             window.location.reload();
         } catch (error) {
             console.error("Error ustvarjanja ponudbe:", error);
@@ -302,7 +312,6 @@
                                     </Button>
                                     <a href={`/chat?user=${applicant.id}`}>
                                         <Button
-                                                on:click={() => handleAcceptApplicant(applicant.id)}
                                                 className="mt-0 ml-0 p-4"
                                                 variation="normal-nomargin"
                                         >Komuniciraj
