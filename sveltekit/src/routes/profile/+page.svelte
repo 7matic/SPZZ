@@ -17,6 +17,7 @@
                     user['company'] = await makeRequest(`/company/update`, 'PUT', user['company']);
                 } else {
                     user = await makeRequest(`/user/update`, 'PUT', user);
+                    await makeRequest('/match', 'GET');
                 }
                 infoMessage = 'Profil uspešno posodobljen.';
             } catch (e) {

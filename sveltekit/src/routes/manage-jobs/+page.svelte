@@ -105,7 +105,6 @@
             editMode = false;
         } catch (error) {
             console.error("Error creating job:", error);
-            errorMessage = "Posodobitev ni uspelo!";
         }
     }
 
@@ -166,6 +165,7 @@
                     user_id: applicantId,
                 },
             );
+            window.location.reload();
         } catch (error) {
             console.error("Error ustvarjanja ponudbe:", error);
         }
@@ -255,7 +255,7 @@
                         {#each applicants.applicants as applicant}
                             <div class="flex items-center justify-center">
                                 <div
-                                        class="shadow-md p-2 mb-5 rounded bg-background grid grid-flow-row grid-cols-4 items-center gap-8"
+                                        class="shadow-md p-2 mb-5 rounded bg-background grid grid-flow-row grid-cols-5 items-center gap-8"
                                 >
                                     <a href={`/user?id=${applicant.id}`}>
                                         <p class="text-primary text-center align-middle">
@@ -263,7 +263,15 @@
                                             {applicant.lastName}
                                         </p>
                                     </a>
-
+                                    {#if applicant.id === selectedJobOffer.position.heldById}
+                                        <p class="text-primary text-center align-middle font-bold text-green-800">
+                                            Izbran
+                                        </p>
+                                    {:else}
+                                        <p class="text-primary text-center align-middle text-red-800">
+                                            Neizbran
+                                        </p>
+                                    {/if}
 
                                     {#if applicant.matches && applicant.matches.length > 0}
                                         <ProgressRadial
@@ -289,12 +297,14 @@
                                     <Button
                                             on:click={() => handleAcceptApplicant(applicant.id)}
                                             className="mt-0 ml-0"
+                                            variation="normal-nomargin"
                                     >Sprejmi
                                     </Button>
                                     <a href={`/chat?user=${applicant.id}`}>
                                         <Button
                                                 on:click={() => handleAcceptApplicant(applicant.id)}
                                                 className="mt-0 ml-0 p-4"
+                                                variation="normal-nomargin"
                                         >Komuniciraj
                                         </Button>
                                     </a>

@@ -9,6 +9,7 @@
         'normal': 'w-full py-2 mt-4 bg-primary text-white rounded hover:bg-blue-600 font-sans transform transition-background duration-200',
         'green': 'w-full py-2 mt-4 text-white rounded font-sans transform transition-background duration-200 bg-green-500 hover:bg-green-600',
         'red': 'w-full py-2 mt-4 text-white rounded font-sans transform transition-background duration-200 bg-red-500 hover:bg-red-600',
+        'normal-nomargin': 'w-full py-2 mt-0 bg-primary text-white rounded hover:bg-blue-600 font-sans transform transition-background duration-200',
     }
 </script>
 
