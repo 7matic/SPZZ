@@ -147,6 +147,16 @@ export async function getJobApplicants(jobId: string, companyId: number) {
         return null;
     }
 
+    applicants?.applicants.sort((a, b) => {
+        if (a.matches.length === 0) {
+            return 1;
+        }
+        if (b.matches.length === 0) {
+            return -1;
+        }
+        return Number(b.matches[0].score) - Number(a.matches[0].score);
+    })
+
     return applicants;
 }
 
