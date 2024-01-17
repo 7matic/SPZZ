@@ -138,24 +138,6 @@
         loadJobOffers();
     }
 
-    async function zakljuciOffer(event) {
-        event.preventDefault();
-        const {id, location, salary} = selectedJobOffer;
-        try {
-            const reg = await makeRequest(`/jobs/update`, "PUT", {
-                id,
-                location,
-                salary,
-                active: false,
-            });
-            showJobDetails(selectedJobOffer);
-            loadJobOffers();
-            editMode = false;
-        } catch (error) {
-            console.error("Error zaključevanja ponudbe:", error);
-        }
-    }
-
     async function handleAcceptApplicant(applicantId: string) {
         try {
             const reg = await makeRequest(
@@ -238,12 +220,7 @@
             </span>
                     </div>
 
-                    <span
-                            class="cursor-pointer bg-primary hover:bg-background p-2 transition rounded"
-                            on:click={zakljuciOffer}
-                    >
-            🗑️ Zaključi ponudbo
-          </span>
+                   
                     <span
                             class="cursor-pointer bg-primary hover:bg-background p-2 transition rounded"
                             on:click={handleRemoveJobOffer}
@@ -279,9 +256,10 @@
                                         </p>
                                     {:else}
                                         <p class="text-primary text-center align-middle text-red-800">
-                                            Neizbran
+                                           
                                         </p>
                                     {/if}
+
 
                                     {#if applicant.matches && applicant.matches.length > 0}
                                         <ProgressRadial
@@ -305,7 +283,7 @@
 
                                     {/if}
 
-                                    {#if applicant.id === selectedJobOffer.position.heldById}
+                                        {#if selectedJobOffer.position.heldById != null}
                                     <p class="text-green-800 font-bold"></p>
                                 {:else}
                                     <Button
@@ -441,16 +419,6 @@
             </div>
         </form>
     {/if}
-
-    <div class="fixed bottom-4 right-4">
-        <a href="/job-create">
-            <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-            >
-                ➕ Ustvari novo ponudbo
-            </button>
-        </a>
-    </div>
 {/if}
 
 <style>
