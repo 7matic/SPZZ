@@ -105,7 +105,35 @@ userRouter.get('/applications', verifyAccessToken, async (req: IGetUserAuthInfoR
                         id: req.user?.id,
                     }
                 }
-            }
+            },
+            include: {
+                position: {
+                    select: {
+                        requirements: true,
+                        description: true,
+                        title: true,
+                        company: {
+                            select: {
+                                name: true,
+                                logo: true,
+                            },
+                        },
+                    },
+                },
+                applicants: {
+                    select: {
+                        id: true,
+                    }
+                },
+                matches: {
+                    select: {
+                        score: true,
+                    },
+                    where: {
+                        userId: Number(req.user?.id),
+                    },
+                },
+            },
         });
 
         return res.json(result);
