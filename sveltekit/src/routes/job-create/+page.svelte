@@ -8,8 +8,8 @@
     let title: string;
     let description: string;
     let requirements: string;
-    let startDate: Date;
-    let endDate: Date;
+    let startDate: string;
+    let endDate: string;
     let errorMessage;
     let positionId;
     let salary: number;
@@ -24,8 +24,6 @@
                     title: title,
                     description: description,
                     requirements: requirements,
-                    startDate: startDate,
-                    endDate: endDate,
                 }
             );
 
@@ -43,6 +41,8 @@
                     salary: salary,
                     active: true,
                     location: location,
+                    startDate: new Date(startDate.toString()),
+                    endDate: new Date(endDate.toString()),
                 }
             );
 
@@ -60,7 +60,7 @@
     }
 
     $: {
-        if (title && description && requirements && startDate && endDate) {
+        if (title && description && requirements) {
             handlePosition();
         }
     }
@@ -115,11 +115,11 @@
             </div>
             <div class="items-center col-span-1">
                 <label for="startDate" class="text-gray-700">Začetni datum:</label>
-                <input id="startDate" class="p-2 border bg-gray-200 font-sans border-gray-300 rounded w-full" type="date" bind:value={startDate} />
+                <input id="startDate" class="p-2 border bg-gray-200 font-sans border-gray-300 rounded w-full" type="date" bind:value={startDate}/>
             </div>
             <div class="items-center col-span-1">
                 <label for="endDate" class="text-gray-700">Končni datum:</label>
-                <input id="endDate" class="p-2 border bg-gray-200 font-sans border-gray-300 rounded w-full" type="date" bind:value={endDate} />
+                <input id="endDate" class="p-2 border bg-gray-200 font-sans border-gray-300 rounded w-full" type="date" bind:value={endDate}/>
             </div>
             <h4 class="mb-4 text-2xl font-bold text-gray-700 col-span-2">2. Dodaj ostale podatke</h4>
             <div class="items-center col-span-2">
