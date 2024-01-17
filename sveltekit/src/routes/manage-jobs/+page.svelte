@@ -11,8 +11,7 @@
     let applicants: any;
     let editMode = false;
     let companyID: any;
-    let startDate: Date;
-    let endDate: Date;
+
 
 
     async function getCompany() {
@@ -73,11 +72,12 @@
         event.preventDefault();
         const {id, location, salary} = selectedJobOffer;
         try {
-            const reg = await makeRequest(`/jobs/update`, "PUT", {
-                id,
+            const reg = await makeRequest(`/jobs/update?id=${selectedJobOffer.id}`, "PUT", {
                 location,
                 salary,
                 active: true,
+                startDate: new Date(selectedJobOffer.startDate.toString()),
+                endDate: new Date(selectedJobOffer.endDate.toString()),
             });
             showJobDetails(selectedJobOffer);
             loadJobOffers();
@@ -91,12 +91,10 @@
     async function handleSubmitEditFormPosition(event) {
         const {id, position} = selectedJobOffer;
         try {
-            const reg = await makeRequest(`/positions/update`, "PUT", {
-                id: position.id,
+            const reg = await makeRequest(`/positions/update?id=${position.id}`, "PUT", {
                 title: position.title,
                 description: position.description,
                 requirements: position.requirements,
-                companyId: position.companyId,
                 heldById: position.heldById,
                 isFilled: position.isFilled,
             });
@@ -377,7 +375,7 @@
                     type="date"
                     id="startDate"
                     name="startDate"
-                    bind:value={startDate}
+                    bind:value={selectedJobOffer.startDate}
             />
 
             <label for="endDate">Končni datum:</label>
@@ -385,7 +383,7 @@
                     type="date"
                     id="endDate"
                     name="endDate"
-                    bind:value={endDate}
+                    bind:value={selectedJobOffer.endDate}
             />
 
             <label for="description">Opis dela:</label>
