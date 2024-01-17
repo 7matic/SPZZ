@@ -2,8 +2,12 @@
     import Logo from "./Logo.svelte";
     import Button from "./Button.svelte";
     import {isAuthenticated} from "../store/authStore";
+    import { page } from '$app/stores';  
+
 
     export let y;
+
+    const currentRoute = $page.url.pathname;
 
     export let unauthTabs = [
         {name: "Prijava", link: "/login", icon: "fas fa-sign-in-alt"},
@@ -34,9 +38,9 @@
     let tabs;
     $: tabs = $isAuthenticated ? (companyExists ? employerTabs : employeeTabs) : unauthTabs;
 
-
 </script>
 
+{#if currentRoute !== '/onboarding'}
 <header
         class={"sticky z-[10] top-0 duration-200 px-6 flex flex-col gap-2 items-center justify-between border-b border-solid py-4 bg-dark border-gray-800 "}
 >
@@ -72,3 +76,4 @@
 
     </div>
 </header>
+{/if}
