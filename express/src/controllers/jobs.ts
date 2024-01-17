@@ -8,8 +8,8 @@ export async function getSortedJobsWithMatches(
   page: string
 ) {
   const findOptions = {
-    skip: page ? Number(page) * 10 : undefined,
-    take: page ? 10 : undefined,
+    skip: page ? Number(page) * 20 : undefined,
+    take: page ? 20 : undefined,
     orderBy:
       sort && sort !== "match" && sort_mode ? { [String(sort)]: String(sort_mode) } : undefined,
   };

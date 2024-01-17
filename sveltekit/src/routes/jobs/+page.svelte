@@ -10,8 +10,8 @@
     let loading = true;
     let userID: any;
     let appliedJobs: Set<string> = new Set();
-    let sort = 'salary';
-    let sort_mode = 'desc';
+    let sort : string;
+    let sort_mode : string;
     let currentPage = 0;
     let infoText = '';
 
@@ -31,7 +31,7 @@
         loadJobs(currentPage, sort, sort_mode);
     }
 
-    async function loadJobs(currentPage: number = 0, sort: string = 'salary', sort_mode: string = 'desc') {
+    async function loadJobs(currentPage: number = 0, sort: string = 'match', sort_mode: string = 'desc') {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const userId = user.id;
@@ -139,19 +139,20 @@
                 <div class="w-full p-4 h-[83vh] overflow-y-scroll">
                     <h2 class="text-3xl font-semibold mb-4">Ponudbe dela</h2>
                     <div class="flex justify-between items-center gap-4 ">
-                        <select bind:value={sort} on:change={() => loadJobs(sort, sort_mode)}
+                        <select bind:value={sort} on:change={() => loadJobs(currentPage, sort, sort_mode)}
                                 class="w-full py-2 px-3 rounded border border-gray-300 mb-4 bg-dark text-white">
+                            <option value="match">Ujemanje</option>
                             <option value="salary">Letna plača</option>
                             <option value="postedAt">Čas objave</option>
                         </select>
-                        <select bind:value={sort_mode} on:change={() => loadJobs(sort, sort_mode)}
+                        <select bind:value={sort_mode} on:change={() => loadJobs(currentPage, sort, sort_mode)}
                                 class="w-full py-2 px-3 rounded border border-gray-300 mb-4 bg-dark text-white">
                             <option value="desc">Padajoče</option>
                             <option value="asc">Naraščajoče</option>
                         </select>
                     </div>
                     {#each data as jobOffer}
-                        <div
+                        <div    
                                 class="{appliedClass(
                   jobOffer,
                   'left'
@@ -172,6 +173,7 @@
                                     {#if jobOffer.matches && jobOffer.matches.length > 0}
                                         <ProgressRadial
                                                 value={Math.round(jobOffer.matches[0].score * 100)}
+                                                fill={"fill-white"}
                                                 width={"w-10"}
                                                 font={200}
                                                 meter={jobOffer.matches[0].score * 100 > 80
