@@ -7,16 +7,20 @@
     let user: any;
     let data: any;
     let loading = true;
+    let userIDD: any;
     let appliedJobs: Set<string> = new Set();
-    let sort = 'salary';
-    let sort_mode = 'desc';
 
-    async function loadJobs(sort: string = 'salary', sort_mode: string = 'desc') {
+
+    async function loadJobs() {
         try {
             // Get user ID from local storage
             const user = JSON.parse(localStorage.getItem('user'));
             const userId = user.id;
-            data = await makeRequest(`/jobs/all?sort=${sort}&sort_mode=${sort_mode}&page=0`, 'GET');
+            userIDD = user.id;
+            data = await makeRequest(`/user/applications`, 'GET');
+
+
+
             data = data.filter(job => {
                 // Check if the user ID is in the applicants array
                 return job.applicants.some(applicant => applicant.id === userId);
@@ -125,46 +129,36 @@
                 <div class="w-full p-4 h-[83vh] overflow-y-scroll">
                     <h2 class="text-3xl font-semibold mb-4">Moje prijave</h2>
                     <div class="flex justify-between items-center gap-4 ">
-                        <select bind:value={sort} on:change={() => loadJobs(sort, sort_mode)}
-                                class="w-full py-2 px-3 rounded border border-gray-300 mb-4 bg-dark text-white">
-                            <option value="salary">Letna plača</option>
-                            <option value="postedAt">Čas objave</option>
-                        </select>
-                        <select bind:value={sort_mode} on:change={() => loadJobs(sort, sort_mode)}
-                                class="w-full py-2 px-3 rounded border border-gray-300 mb-4 bg-dark text-white">
-                            <option value="desc">Padajoče</option>
-                            <option value="asc">Naraščajoče</option>
-                        </select>
+                       
                     </div>
                     {#each data as jobOffer}
-                        <div
-                                class="{appliedClass(
-                  jobOffer,
-                  'left'
-                )} bg-dark shadow-md p-4 mb-4 flex items-top cursor-pointer rounded hover:bg-background transition"
-                                on:click={() => showJobDetails(jobOffer)}
-                        >
-                            <div class="mr-4 align-top">
-                                <img
-                                        class="h-15 w-16"
-                                        src={jobOffer.position.company.logo}
-                                        alt="Company Logo"
-                                />
-                            </div>
-                            <div>
-                                <h5 class="text-2xl text-white font-bold mb-2">
-                                    {jobOffer.position.title}
-                                </h5>
-                                <p class="text-white text-lg">{jobOffer.position.company.name}</p>
-                                <p class="text-primary"><span class="font-bold">Lokacija:</span> {jobOffer.location}</p>
-                                <p class="text-primary"><span class="font-bold">Letna plača: </span>{jobOffer.salary} €
-                                </p>
-                                <p class="text-primary text-xs pt-2">
-                                    {formatPostedTime(jobOffer.postedAt)}
-                                </p>
-                            </div>
+                    <div class="{appliedClass(jobOffer, 'left')} bg-dark shadow-md p-4 mb-4 flex items-top cursor-pointer rounded hover:bg-background transition" on:click={() => showJobDetails(jobOffer)}>
+                        <div class="mr-4 align-top">
+                            <img class="h-15 w-16" src={jobOffer.position.company.logo} alt="Company Logo" />
                         </div>
-                    {/each}
+                        <div>
+                            <h5 class="text-2xl text-white font-bold mb-2">
+                                {jobOffer.position.title}
+                            </h5>
+                            <p class="text-white text-lg">{jobOffer.position.company.name}</p>
+                            <p class="text-primary"><span class="font-bold">Lokacija:</span> {jobOffer.location}</p>
+                            <p class="text-primary"><span class="font-bold">Letna plača: </span>{jobOffer.salary} €</p>
+                            <p class="text-primary text-xs pt-2">
+                                {formatPostedTime(jobOffer.postedAt)}
+                            </p>
+                        </div>
+                        <div class="ml-auto">
+                            {#if jobOffer.active == false}
+                                {#if jobOffer.position.heldById == userIDD}
+                                    <p>Čestitke, bili ste sprejeti!</p>
+                                {:else}
+                                    <p>Žal niste bili izbrani</p>
+                                {/if}
+                            {/if}
+                        </div>
+                    </div>
+                {/each}
+                
                 </div>
             </div>
         </div>
@@ -206,11 +200,13 @@
                             {selectedJobOffer.position.requirements}
                         </p>
                     </div>
+                    {#if selectedJobOffer.active == true}
                     <Button
                             variation="{getApplyButtonStyle(selectedJobOffer)}"
                             on:click={applyNow}>
                         {getApplyButtonText(selectedJobOffer)}
                     </Button>
+                        {/if}
                     <a href="/chat?company={selectedJobOffer.companyId}">
                         <Button>
                             Komunicirajte s podjetjem
