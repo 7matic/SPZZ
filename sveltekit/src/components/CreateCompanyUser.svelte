@@ -26,18 +26,22 @@
             });
             const user = await getUser();
             localStorage.setItem('user', JSON.stringify(user));
-			showPopup = true;
         } catch (error) {
             errorMessage = error.message;
         } finally {
             isLoading = false;
-			
+            onClose();
         }
     }
 
     function onClose(){
+        showPopup = true;
+    }
+
+    async function handlePopupButtonClick() {
         window.location.href = '/logout';
     }
+
 </script>
 
 <form on:submit|preventDefault={handleSubmit} class="flex gap-y-4 flex-col">
@@ -63,7 +67,7 @@
       <div class="bg-black bg-opacity-50 w-full h-full absolute"></div>
       <div class="bg-white p-8 rounded shadow-md z-10 relative max-w-lg text-center">
         <p class="text-gray-700">Za shranitev podatkov je potrebna ponovna prijava.</p>
-        <Button on:click={onClose}>
+        <Button on:click={handlePopupButtonClick}>
           Ponovna prijava
         </Button>
       </div>
