@@ -18,6 +18,9 @@ export async function getSortedJobsWithMatches(
 
   try {
     jobs = await prisma.jobOffer.findMany({
+      where: {
+        active: true,
+      },
       include: {
         position: {
           select: {
