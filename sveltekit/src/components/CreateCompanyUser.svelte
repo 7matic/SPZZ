@@ -36,7 +36,7 @@
     }
 
     function onClose(){
-        window.location.href = '/login';
+        window.location.href = '/logout';
     }
 </script>
 
