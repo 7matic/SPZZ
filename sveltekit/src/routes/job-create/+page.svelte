@@ -56,7 +56,7 @@
 
     async function handleMatchUsers() {
         const get = await makeRequest(`/matchJobToUsers/?id=${jobId}`, 'GET');
-        window.location.href = '/applications';
+        window.location.href = '/manage-jobs';
     }
 
     $: {
