@@ -91,7 +91,7 @@
         const jobId = selectedJobOffer.id;
         try {
             const isWithdrawal = appliedJobs.has(jobId);
-            const response = makeRequest(
+            const response = await makeRequest(
                 `/jobs/apply_job?id=${jobId}`,
                 "POST",
                 {
