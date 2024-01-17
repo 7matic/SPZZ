@@ -285,8 +285,9 @@
 
                                     {#if applicant.matches && applicant.matches.length > 0}
                                         <ProgressRadial
-                                                value={applicant.matches[0].score * 100}
+                                        value={Math.round(applicant.matches[0].score * 100)}
                                                 width={"w-10"}
+                                                fill={"fill-white"}
                                                 font={200}
                                                 meter={applicant.matches[0].score * 100 > 80
                         ? "stroke-green-800"
@@ -299,7 +300,7 @@
                                                 data-theme={"primary"}
                                                 track={"stroke-gray-600"}
                                         >
-                                            {applicant.matches[0].score * 100}
+                                            {Math.round(applicant.matches[0].score * 100)}
                                         </ProgressRadial>
 
                                     {/if}
