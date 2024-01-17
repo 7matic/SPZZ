@@ -112,6 +112,7 @@ userRouter.get('/applications', verifyAccessToken, async (req: IGetUserAuthInfoR
                         requirements: true,
                         description: true,
                         title: true,
+                        heldById: true,
                         company: {
                             select: {
                                 name: true,
