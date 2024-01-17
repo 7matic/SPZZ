@@ -63,13 +63,16 @@ jobsRouter.post("/create", verifyAccessToken, async (req: IGetUserAuthInfoReques
 });
 
 jobsRouter.put("/update", verifyAccessToken, async (req: IGetUserAuthInfoRequest, res) => {
+  const id = req.query.id;
   try {
     const updatedOffer = await prisma.jobOffer.update({
       where: {
-        id: Number(req.body.id),
+        id: Number(id),
         companyId: req.user?.company_id
       },
       data: {
+        startDate: new Date(req.body.startDate),
+        endDate: new Date(req.body.endDate),
         salary: Number(req.body.salary),
         active: Boolean(req.body.active),
         location: String(req.body.location),
