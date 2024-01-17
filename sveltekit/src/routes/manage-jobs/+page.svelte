@@ -304,12 +304,16 @@
 
                                     {/if}
 
+                                    {#if applicant.id === selectedJobOffer.position.heldById}
+                                    <p class="text-green-800 font-bold"></p>
+                                {:else}
                                     <Button
-                                            on:click={() => handleAcceptApplicant(applicant.id)}
-                                            className="mt-0 ml-0"
-                                            variation="normal-nomargin"
+                                        on:click={() => handleAcceptApplicant(applicant.id)}
+                                        className="mt-0 ml-0"
+                                        variation="normal-nomargin"
                                     >Sprejmi
                                     </Button>
+                                {/if}
                                     <a href={`/chat?user=${applicant.id}`}>
                                         <Button
                                                 className="mt-0 ml-0 p-4"
